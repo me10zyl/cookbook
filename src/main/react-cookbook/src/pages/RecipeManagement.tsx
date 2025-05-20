@@ -2,6 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Tabs, Table, Button, Modal, Form, Input, Select, InputNumber, Upload, message, Popconfirm, Switch, Space, Typography } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined, MinusCircleOutlined} from '@ant-design/icons';
 import { Recipe, Ingredient } from '../types';
+import {
+  createRecipe, 
+  deleteIngredient, 
+  updateRecipe, 
+  deleteRecipe, 
+  getAllIngredients, 
+  createIngredient, 
+  updateIngredient,
+  getAllRecipes
+} from '../api.ts';
 
 const { TabPane } = Tabs;
 const { Title, Paragraph } = Typography;
@@ -24,89 +34,37 @@ const RecipeManagement: React.FC = () => {
 
   // 模拟从API获取数据
   useEffect(() => {
-    // 这里应该是实际的API调用
-    // 模拟数据加载
-    setRecipeLoading(true);
-    setTimeout(() => {
-      // 模拟菜谱数据
-      const mockRecipes: Recipe[] = [
-        {
-          recipeId: 1,
-          recipeName: '红烧肉',
-          description: '经典家常菜，肥而不腻，口感醇厚',
-          imageUrl: 'https://via.placeholder.com/300x200?text=红烧肉',
-          bilibiliUrl: 'https://www.bilibili.com/video/sample1',
-          isMeat: 1,
-          isSoup: 0,
-          cookTime: 60,
-          difficulty: '中等',
-          steps: '1. 准备食材\n2. 热锅冷油\n3. 炒制食材\n4. 加入调料\n5. 焖煮收汁'
-        },
-        {
-          recipeId: 2,
-          recipeName: '西红柿炒鸡蛋',
-          description: '简单易做的家常菜，酸甜可口',
-          imageUrl: 'https://via.placeholder.com/300x200?text=西红柿炒鸡蛋',
-          bilibiliUrl: 'https://www.bilibili.com/video/sample2',
-          isMeat: 1,
-          isSoup: 0,
-          cookTime: 15,
-          difficulty: '简单',
-          steps: '1. 准备食材\n2. 热锅冷油\n3. 炒制食材\n4. 加入调料\n5. 出锅装盘'
-        },
-      ];
-      setRecipes(mockRecipes);
-      setRecipeLoading(false);
-
-      // 模拟食材数据
+    const fetchData = async () => {
+      setRecipeLoading(true);
       setIngredientLoading(true);
-      const mockIngredients: Ingredient[] = [
-        {
-          ingredientsId: 1,
-          ingredientsName: '猪肉',
-          isMeat: 1,
-          isMain: 1,
-          isFlavour: 0,
-          quantity: '500g'
-        },
-        {
-          ingredientsId: 2,
-          ingredientsName: '西红柿',
-          isMeat: 0,
-          isMain: 1,
-          isFlavour: 0,
-          quantity: '2个'
-        },
-        {
-          ingredientsId: 3,
-          ingredientsName: '鸡蛋',
-          isMeat: 1,
-          isMain: 1,
-          isFlavour: 0,
-          quantity: '3个'
-        },
-        {
-          ingredientsId: 4,
-          ingredientsName: '盐',
-          isMeat: 0,
-          isMain: 0,
-          isFlavour: 1,
-          quantity: '适量'
-        },
-      ];
-      setIngredients(mockIngredients);
-      setIngredientLoading(false);
-    }, 1000);
+      try {
+        // 获取所有菜谱
+        const recipeResponse = await getAllRecipes();
+        setRecipes(recipeResponse.data);
+
+        // 获取所有食材
+        const ingredientResponse = await getAllIngredients();
+        setIngredients(ingredientResponse.data);
+      } catch (error) {
+        console.error('数据获取失败:', error);
+        message.error('数据获取失败，请稍后重试');
+      } finally {
+        setRecipeLoading(false);
+        setIngredientLoading(false);
+      }
+    };
+    
+    fetchData();
   }, []);
 
   // 食谱相关操作
-  const handleAddRecipe = () => {
+  const handleAddRecipe = async () => {
     setEditingRecipeId(null);
     recipeForm.resetFields();
     setRecipeModalVisible(true);
   };
 
-  const handleEditRecipe = (record: Recipe) => {
+  const handleEditRecipe = async (record: Recipe) => {
     setEditingRecipeId(record.recipeId);
     recipeForm.setFieldsValue({
       recipeName: record.recipeName,
@@ -122,59 +80,66 @@ const RecipeManagement: React.FC = () => {
     setRecipeModalVisible(true);
   };
 
-  const handleDeleteRecipe = (recipeId: number) => {
-    // 这里应该是实际的API调用
-    // 模拟删除操作
-    setRecipes(recipes.filter(recipe => recipe.recipeId !== recipeId));
-    message.success('删除成功');
+  const handleDeleteRecipe = async (recipeId: number) => {
+    try {
+      await deleteRecipe(recipeId);
+      setRecipes(recipes.filter(recipe => recipe.recipeId !== recipeId));
+      message.success('删除成功');
+    } catch (error) {
+      console.error('删除失败:', error);
+      message.error('删除失败，请稍后重试');
+    }
   };
 
-  const handleRecipeFormSubmit = () => {
-    recipeForm.validateFields().then(values => {
-      // 处理烹饪步骤数据
-      const formattedSteps = values.formattedSteps?.map((step: any, index: number) => ({
-        ...step,
-        stepNumber: index + 1
-      }));
+  const handleRecipeFormSubmit = async () => {
+    try {
+      await recipeForm.validateFields().then(async (values) => {
+        // 处理烹饪步骤数据
+        const formattedSteps = values.formattedSteps?.map((step: any, index: number) => ({
+          ...step,
+          stepNumber: index + 1
+        }));
 
-      // 构建提交的数据
-      const recipeData = {
-        ...values,
-        formattedSteps,
-        steps: formattedSteps?.map((step: CookingStep) => `${step.stepNumber}. ${step.description}`).join('\n')
-      };
-
-      if (editingRecipeId === null) {
-        // 新增
-        const newRecipe: Recipe = {
-          ...recipeData,
-          recipeId: Math.max(...recipes.map(r => r.recipeId), 0) + 1
+        // 构建提交的数据
+        const recipeData = {
+          ...values,
+          formattedSteps,
+          steps: formattedSteps?.map((step: any) => `${step.stepNumber}. ${step.description}`).join('\n')
         };
-        setRecipes([...recipes, newRecipe]);
-        message.success('添加成功');
-      } else {
-        // 编辑
-        const updatedRecipes = recipes.map(recipe => {
-          if (recipe.recipeId === editingRecipeId) {
-            return { ...recipe, ...recipeData };
-          }
-          return recipe;
-        });
-        setRecipes(updatedRecipes);
-        message.success('更新成功');
-      }
-      setRecipeModalVisible(false);
-    });
+
+        if (editingRecipeId === null) {
+          // 新增
+          const response = await createRecipe(recipeData);
+          setRecipes([...recipes, response.data]);
+          message.success('添加成功');
+        } else {
+          // 编辑
+          const response = await updateRecipe(editingRecipeId, recipeData);
+          const updatedRecipes = recipes.map(recipe => {
+            if (recipe.recipeId === editingRecipeId) {
+              return response.data;
+            }
+            return recipe;
+          });
+          setRecipes(updatedRecipes);
+          message.success('更新成功');
+        }
+        setRecipeModalVisible(false);
+      });
+    } catch (error) {
+      console.error('提交失败:', error);
+      message.error('提交失败，请稍后重试');
+    }
   };
 
   // 食材相关操作
-  const handleAddIngredient = () => {
+  const handleAddIngredient = async () => {
     setEditingIngredientId(null);
     ingredientForm.resetFields();
     setIngredientModalVisible(true);
   };
 
-  const handleEditIngredient = (record: Ingredient) => {
+  const handleEditIngredient = async (record: Ingredient) => {
     setEditingIngredientId(record.ingredientsId);
     ingredientForm.setFieldsValue({
       ingredientsName: record.ingredientsName,
@@ -186,38 +151,43 @@ const RecipeManagement: React.FC = () => {
     setIngredientModalVisible(true);
   };
 
-  const handleDeleteIngredient = (ingredientId: number) => {
-    // 这里应该是实际的API调用
-    // 模拟删除操作
-    setIngredients(ingredients.filter(ingredient => ingredient.ingredientsId !== ingredientId));
-    message.success('删除成功');
+  const handleDeleteIngredient = async (ingredientId: number) => {
+    try {
+      await deleteIngredient(ingredientId);
+      setIngredients(ingredients.filter(ingredient => ingredient.ingredientsId !== ingredientId));
+      message.success('删除成功');
+    } catch (error) {
+      console.error('删除失败:', error);
+      message.error('删除失败，请稍后重试');
+    }
   };
 
-  const handleIngredientFormSubmit = () => {
-    ingredientForm.validateFields().then(values => {
-      // 这里应该是实际的API调用
-      // 模拟提交操作
-      if (editingIngredientId === null) {
-        // 新增
-        const newIngredient: Ingredient = {
-          ...values,
-          ingredientsId: Math.max(...ingredients.map(i => i.ingredientsId), 0) + 1
-        };
-        setIngredients([...ingredients, newIngredient]);
-        message.success('添加成功');
-      } else {
-        // 编辑
-        const updatedIngredients = ingredients.map(ingredient => {
-          if (ingredient.ingredientsId === editingIngredientId) {
-            return { ...ingredient, ...values };
-          }
-          return ingredient;
-        });
-        setIngredients(updatedIngredients);
-        message.success('更新成功');
-      }
-      setIngredientModalVisible(false);
-    });
+  const handleIngredientFormSubmit = async () => {
+    try {
+      await ingredientForm.validateFields().then(async (values) => {
+        if (editingIngredientId === null) {
+          // 新增
+          const response = await createIngredient(values);
+          setIngredients([...ingredients, response.data]);
+          message.success('添加成功');
+        } else {
+          // 编辑
+          const response = await updateIngredient(editingIngredientId, values);
+          const updatedIngredients = ingredients.map(ingredient => {
+            if (ingredient.ingredientsId === editingIngredientId) {
+              return response.data;
+            }
+            return ingredient;
+          });
+          setIngredients(updatedIngredients);
+          message.success('更新成功');
+        }
+        setIngredientModalVisible(false);
+      });
+    } catch (error) {
+      console.error('提交失败:', error);
+      message.error('提交失败，请稍后重试');
+    }
   };
 
   // 食谱表格列定义
