@@ -20,7 +20,7 @@ public interface RecipeService extends IService<Recipes> {
 
     void deleteRecipe(Integer recipeId);
 
-    List<Recipes> getAllRecipes();
+    List<Recipes> getAllRecipes(String name);
 
     CookIngredients createIngredient(CookIngredients ingredient);
 

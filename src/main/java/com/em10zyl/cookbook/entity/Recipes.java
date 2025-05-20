@@ -1,12 +1,14 @@
 package com.em10zyl.cookbook.entity;
 
 import com.baomidou.mybatisplus.annotation.IEnum;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 
 @Data
@@ -47,6 +49,10 @@ public class Recipes {
 
     
     private Timestamp updatedAt;
+
+    @TableField(exist = false)
+
+    List<CookIngredients> ingredients;
 
     @AllArgsConstructor
     public enum Difficulty implements IEnum<String> {

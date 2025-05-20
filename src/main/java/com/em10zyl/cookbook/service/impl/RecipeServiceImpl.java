@@ -1,5 +1,6 @@
 package com.em10zyl.cookbook.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import com.em10zyl.cookbook.entity.CookIngredients;
@@ -25,6 +26,7 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
         if (recipe == null) {
             return null;
         }
+        recipe.setIngredients(integredientsService.findByRecipeId(recipeId));
         return recipe;
     }
 
@@ -36,6 +38,10 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
     @Override
     public Recipes createRecipe(Recipes recipe) {
         save(recipe);
+        List<CookIngredients> ingredients = recipe.getIngredients();
+        if(StrUtil.isNotBlank(ingredients)){
+
+        }
         return recipe;
     }
 
@@ -52,7 +58,10 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
     }
 
     @Override
-    public List<Recipes> getAllRecipes() {
+    public List<Recipes> getAllRecipes(String name) {
+        if (StrUtil.isNotBlank(name)) {
+            return lambdaQuery().like(Recipes::getRecipeName, name).list();
+        }
         return list();
     }
 

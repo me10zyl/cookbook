@@ -50,8 +50,8 @@ public class RecipeController {
 
     // 获取所有菜谱
     @GetMapping("/list")
-    public ResponseEntity<List<Recipes>> getAllRecipes() {
-        List<Recipes> recipes = recipeService.getAllRecipes();
+    public ResponseEntity<List<Recipes>> getAllRecipes(@RequestParam String name) {
+        List<Recipes> recipes = recipeService.getAllRecipes(name);
         return new ResponseEntity<>(recipes, HttpStatus.OK);
     }
 }
