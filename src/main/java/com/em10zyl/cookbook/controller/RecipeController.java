@@ -1,6 +1,8 @@
 package com.em10zyl.cookbook.controller;
 
+import com.em10zyl.cookbook.dto.IngredientDTO;
 import com.em10zyl.cookbook.dto.RecipeDTO;
+import com.em10zyl.cookbook.entity.Recipes;
 import com.em10zyl.cookbook.service.RecipeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,8 +19,8 @@ public class RecipeController {
 
     // 菜谱展示页面
     @GetMapping("/{recipeId}")
-    public ResponseEntity<RecipeDTO> getRecipeDetails(@PathVariable Long recipeId) {
-        RecipeDTO recipe = recipeService.getRecipeById(recipeId);
+    public ResponseEntity<Recipes> getRecipeDetails(@PathVariable Long recipeId) {
+        Recipes recipe = recipeService.getRecipeById(recipeId);
         return new ResponseEntity<>(recipe, HttpStatus.OK);
     }
 

@@ -5,11 +5,11 @@ import { HomeOutlined, SearchOutlined, BookOutlined, CalendarOutlined } from '@a
 import './App.css';
 
 // 导入页面组件
-import RecipeDetail from './pages/RecipeDetail';
-import IngredientSearch from './pages/IngredientSearch';
-import RecipeIngredients from './pages/RecipeIngredients';
-import DailyRecommendation from './pages/DailyRecommendation';
-import Home from './pages/Home';
+import RecipeDetail from './pages/RecipeDetail.tsx';
+import IngredientSearch from './pages/IngredientSearch.tsx';
+import RecipeIngredients from './pages/RecipeIngredients.tsx';
+import DailyRecommendation from './pages/DailyRecommendation.tsx';
+import Home from './pages/Home.tsx';
 
 const { Header, Content, Footer } = Layout;
 const { Title } = Typography;

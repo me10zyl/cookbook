@@ -2,16 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Row, Col, Card, Typography, Spin, Empty, Menu, Layout, Divider, Button } from 'antd';
 import { RightOutlined, BookOutlined, FireOutlined, CoffeeOutlined, BulbOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import RecipeDetail from './RecipeDetail';
+import RecipeDetail from './RecipeDetail.tsx';
+import { Recipe } from '../types';
 
 const { Title, Paragraph } = Typography;
 const { Meta } = Card;
 const { Sider, Content } = Layout;
 
-const Home = () => {
-  const [recipes, setRecipes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedRecipe, setSelectedRecipe] = useState(null);
+const Home: React.FC = () => {
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
   // 模拟从API获取菜谱数据
   useEffect(() => {
@@ -19,49 +20,49 @@ const Home = () => {
     // 模拟数据加载
     setTimeout(() => {
       // 模拟菜谱数据
-      const mockRecipes = [
+      const mockRecipes: Recipe[] = [
         {
-          recipe_id: 1,
-          recipe_name: '红烧肉',
+          recipeId: 1,
+          recipeName: '红烧肉',
           description: '经典家常菜，肥而不腻，口感醇厚',
-          image_url: 'https://via.placeholder.com/300x200?text=红烧肉',
-          bilibili_url: 'https://www.bilibili.com/video/sample1',
-          is_meat: 1,
-          is_soup: 0,
-          cook_time: 60,
+          imageUrl: 'https://via.placeholder.com/300x200?text=红烧肉',
+          bilibiliUrl: 'https://www.bilibili.com/video/sample1',
+          isMeat: 1,
+          isSoup: 0,
+          cookTime: 60,
           difficulty: '中等'
         },
         {
-          recipe_id: 2,
-          recipe_name: '西红柿炒鸡蛋',
+          recipeId: 2,
+          recipeName: '西红柿炒鸡蛋',
           description: '简单易做的家常菜，酸甜可口',
-          image_url: 'https://via.placeholder.com/300x200?text=西红柿炒鸡蛋',
-          bilibili_url: 'https://www.bilibili.com/video/sample2',
-          is_meat: 1,
-          is_soup: 0,
-          cook_time: 15,
+          imageUrl: 'https://via.placeholder.com/300x200?text=西红柿炒鸡蛋',
+          bilibiliUrl: 'https://www.bilibili.com/video/sample2',
+          isMeat: 1,
+          isSoup: 0,
+          cookTime: 15,
           difficulty: '简单'
         },
         {
-          recipe_id: 3,
-          recipe_name: '紫菜蛋花汤',
+          recipeId: 3,
+          recipeName: '紫菜蛋花汤',
           description: '营养丰富的家常汤品',
-          image_url: 'https://via.placeholder.com/300x200?text=紫菜蛋花汤',
-          bilibili_url: 'https://www.bilibili.com/video/sample3',
-          is_meat: 0,
-          is_soup: 1,
-          cook_time: 20,
+          imageUrl: 'https://via.placeholder.com/300x200?text=紫菜蛋花汤',
+          bilibiliUrl: 'https://www.bilibili.com/video/sample3',
+          isMeat: 0,
+          isSoup: 1,
+          cookTime: 20,
           difficulty: '简单'
         },
         {
-          recipe_id: 4,
-          recipe_name: '麻婆豆腐',
+          recipeId: 4,
+          recipeName: '麻婆豆腐',
           description: '川菜经典，麻辣鲜香',
-          image_url: 'https://via.placeholder.com/300x200?text=麻婆豆腐',
-          bilibili_url: 'https://www.bilibili.com/video/sample4',
-          is_meat: 1,
-          is_soup: 0,
-          cook_time: 30,
+          imageUrl: 'https://via.placeholder.com/300x200?text=麻婆豆腐',
+          bilibiliUrl: 'https://www.bilibili.com/video/sample4',
+          isMeat: 1,
+          isSoup: 0,
+          cookTime: 30,
           difficulty: '中等'
         },
       ];
@@ -75,8 +76,8 @@ const Home = () => {
   }, []);
 
   // 处理菜谱选择
-  const handleRecipeSelect = (recipeId) => {
-    const recipe = recipes.find(r => r.recipe_id === recipeId);
+  const handleRecipeSelect = (recipeId: number): void => {
+    const recipe = recipes.find(r => r.recipeId === recipeId);
     if (recipe) {
       setSelectedRecipe(recipe);
     }
@@ -100,12 +101,12 @@ const Home = () => {
             ) : recipes.length > 0 ? (
               <Menu
                 mode="inline"
-                selectedKeys={[selectedRecipe ? selectedRecipe.recipe_id.toString() : '']}
+                selectedKeys={[selectedRecipe ? selectedRecipe.recipeId.toString() : '']}
                 style={{ height: '100%' }}
                 items={recipes.map(recipe => ({
-                  key: recipe.recipe_id.toString(),
-                  label: recipe.recipe_name,
-                  icon: recipe.is_meat === 1 ? <FireOutlined /> : <CoffeeOutlined />
+                  key: recipe.recipeId.toString(),
+                  label: recipe.recipeName,
+                  icon: recipe.isMeat === 1 ? <FireOutlined /> : <CoffeeOutlined />
                 }))}
                 onClick={({ key }) => handleRecipeSelect(parseInt(key))}
               />

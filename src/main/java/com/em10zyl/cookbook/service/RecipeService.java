@@ -1,15 +1,16 @@
 package com.em10zyl.cookbook.service;
 
-import com.em10zyl.cookbook.dto.RecipeDTO;
-import com.em10zyl.cookbook.dto.IngredientDTO;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.em10zyl.cookbook.entity.CookIngredients;
+import com.em10zyl.cookbook.entity.Recipes;
+
 import java.util.List;
 
-public interface RecipeService {
-    RecipeDTO getRecipeById(Long recipeId);
+public interface RecipeService extends IService<Recipes> {
+    Recipes getRecipeById(Long recipeId);
+
     
-    List<RecipeDTO> matchRecipes(List<Long> ingredientIds, Boolean isMeat);
+    List<CookIngredients> getIngredientsForRecipe(Long recipeId);
     
-    List<IngredientDTO> getIngredientsForRecipe(Long recipeId);
-    
-    List<RecipeDTO> getDailyRecommendations(String preference);
+    List<Recipes> getDailyRecommendations(String preference);
 }
