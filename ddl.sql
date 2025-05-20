@@ -1,3 +1,5 @@
+create database cookbook;
+use cookbook;
 -- auto-generated definition
 create table cook_ingredients
 (
