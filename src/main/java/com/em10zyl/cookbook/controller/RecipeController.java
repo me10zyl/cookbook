@@ -1,7 +1,7 @@
 package com.em10zyl.cookbook.controller;
 
-import com.em10zyl.cookbook.dto.IngredientDTO;
-import com.em10zyl.cookbook.dto.RecipeDTO;
+
+import com.em10zyl.cookbook.entity.CookIngredients;
 import com.em10zyl.cookbook.entity.Recipes;
 import com.em10zyl.cookbook.service.RecipeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,25 +26,25 @@ public class RecipeController {
 
     // 食材匹配菜谱页面
     @PostMapping("/match")
-    public ResponseEntity<List<RecipeDTO>> matchRecipesByIngredients(
+    public ResponseEntity<List<Recipes>> matchRecipesByIngredients(
             @RequestBody List<Long> ingredientIds, 
             @RequestParam(required = false) Boolean isMeat) {
-        List<RecipeDTO> recipes = recipeService.matchRecipes(ingredientIds, isMeat);
+        List<Recipes> recipes = recipeService.matchRecipes(ingredientIds, isMeat);
         return new ResponseEntity<>(recipes, HttpStatus.OK);
     }
 
     // 菜谱反查食材页面
     @GetMapping("/{recipeId}/ingredients")
-    public ResponseEntity<List<IngredientDTO>> getIngredientsByRecipe(@PathVariable Long recipeId) {
-        List<IngredientDTO> ingredients = recipeService.getIngredientsForRecipe(recipeId);
+    public ResponseEntity<List<CookIngredients>> getIngredientsByRecipe(@PathVariable Long recipeId) {
+        List<CookIngredients> ingredients = recipeService.getIngredientsForRecipe(recipeId);
         return new ResponseEntity<>(ingredients, HttpStatus.OK);
     }
 
     // 每日随机菜谱推荐页面
     @GetMapping("/daily-recommendations")
-    public ResponseEntity<List<RecipeDTO>> getDailyRecommendations(
+    public ResponseEntity<List<Recipes>> getDailyRecommendations(
             @RequestParam(required = false) String preference) {
-        List<RecipeDTO> recommendations = recipeService.getDailyRecommendations(preference);
+        List<Recipes> recommendations = recipeService.getDailyRecommendations(preference);
         return new ResponseEntity<>(recommendations, HttpStatus.OK);
     }
 }

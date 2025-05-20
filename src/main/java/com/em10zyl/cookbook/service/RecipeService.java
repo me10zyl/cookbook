@@ -13,4 +13,7 @@ public interface RecipeService extends IService<Recipes> {
     List<CookIngredients> getIngredientsForRecipe(Long recipeId);
     
     List<Recipes> getDailyRecommendations(String preference);
+
+    List<Recipes> matchRecipes(List<Long> ingredientIds, Boolean isMeat);
+
 }
