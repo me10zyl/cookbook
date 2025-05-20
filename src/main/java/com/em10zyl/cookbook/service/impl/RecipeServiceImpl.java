@@ -34,6 +34,58 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
     }
 
     @Override
+    public Recipes createRecipe(Recipes recipe) {
+        save(recipe);
+        return recipe;
+    }
+
+    @Override
+    public Recipes updateRecipe(Long recipeId, Recipes recipe) {
+        recipe.setRecipeId(recipeId);
+        updateById(recipe);
+        return recipe;
+    }
+
+    @Override
+    public void deleteRecipe(Integer recipeId) {
+        removeById(recipeId);
+    }
+
+    @Override
+    public List<Recipes> getAllRecipes() {
+        return list();
+    }
+
+    @Override
+    public CookIngredients createIngredient(CookIngredients ingredient) {
+        integredientsService.save(ingredient);
+        return ingredient;
+    }
+
+    @Override
+    public CookIngredients updateIngredient(Integer ingredientId, CookIngredients ingredient) {
+        ingredient.setIngredientsId(ingredientId);
+        integredientsService.updateById(ingredient);
+        return ingredient;
+    }
+
+    @Override
+    public void deleteIngredient(Integer ingredientId) {
+        integredientsService.removeById(ingredientId);
+    }
+
+    @Override
+    public List<CookIngredients> getAllIngredients() {
+        return integredientsService.list();
+    }
+
+    @Override
+    public List<Recipes> matchRecipes(List<Long> ingredientIds, Boolean isMeat) {
+        // 这里需要实现具体的食材匹配逻辑
+        return new ArrayList<>();
+    }
+
+    @Override
     public List<Recipes> getDailyRecommendations(String preference) {
         List<Recipes> allRecipes = list();
         List<Recipes> filteredRecipes = allRecipes;

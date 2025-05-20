@@ -124,7 +124,7 @@ const Home: React.FC = () => {
               <Spin size="large" />
             </div>
           ) : selectedRecipe ? (
-            <RecipeDetail />
+            <RecipeDetail recipe={selectedRecipe} />
           ) : (
             <Empty description="请从左侧选择一个菜谱" />
           )}

@@ -47,4 +47,11 @@ public class RecipeController {
         List<Recipes> recommendations = recipeService.getDailyRecommendations(preference);
         return new ResponseEntity<>(recommendations, HttpStatus.OK);
     }
+
+    // 获取所有菜谱
+    @GetMapping("/list")
+    public ResponseEntity<List<Recipes>> getAllRecipes() {
+        List<Recipes> recipes = recipeService.getAllRecipes();
+        return new ResponseEntity<>(recipes, HttpStatus.OK);
+    }
 }

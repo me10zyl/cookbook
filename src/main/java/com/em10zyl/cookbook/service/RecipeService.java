@@ -14,6 +14,22 @@ public interface RecipeService extends IService<Recipes> {
     
     List<Recipes> getDailyRecommendations(String preference);
 
+    Recipes createRecipe(Recipes recipe);
+
+    Recipes updateRecipe(Long recipeId, Recipes recipe);
+
+    void deleteRecipe(Integer recipeId);
+
+    List<Recipes> getAllRecipes();
+
+    CookIngredients createIngredient(CookIngredients ingredient);
+
+    CookIngredients updateIngredient(Integer ingredientId, CookIngredients ingredient);
+
+    void deleteIngredient(Integer ingredientId);
+
+    List<CookIngredients> getAllIngredients();
+
     List<Recipes> matchRecipes(List<Long> ingredientIds, Boolean isMeat);
 
 }

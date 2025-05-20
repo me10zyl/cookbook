@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Layout, Menu, Typography } from 'antd';
-import { HomeOutlined, SearchOutlined, BookOutlined, CalendarOutlined } from '@ant-design/icons';
+import { HomeOutlined, SearchOutlined, BookOutlined, CalendarOutlined, SettingOutlined } from '@ant-design/icons';
 import './App.css';
 
 // 导入页面组件
@@ -10,6 +10,7 @@ import IngredientSearch from './pages/IngredientSearch.tsx';
 import RecipeIngredients from './pages/RecipeIngredients.tsx';
 import DailyRecommendation from './pages/DailyRecommendation.tsx';
 import Home from './pages/Home.tsx';
+import RecipeManagement from './pages/RecipeManagement.tsx';
 
 const { Header, Content, Footer } = Layout;
 const { Title } = Typography;
@@ -35,6 +36,9 @@ function App() {
             <Menu.Item key="4" icon={<CalendarOutlined />}>
               <Link to="/daily-recommendation">每日推荐</Link>
             </Menu.Item>
+            <Menu.Item key="5" icon={<SettingOutlined />}>
+              <Link to="/management">管理中心</Link>
+            </Menu.Item>
           </Menu>
         </Header>
         <Content style={{ padding: '0 50px', marginTop: 20 }}>
@@ -45,6 +49,7 @@ function App() {
               <Route path="/ingredient-search" element={<IngredientSearch />} />
               <Route path="/recipe-ingredients" element={<RecipeIngredients />} />
               <Route path="/daily-recommendation" element={<DailyRecommendation />} />
+              <Route path="/management" element={<RecipeManagement />} />
             </Routes>
           </div>
         </Content>
