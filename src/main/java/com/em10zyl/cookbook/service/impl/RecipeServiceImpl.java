@@ -1,15 +1,21 @@
 package com.em10zyl.cookbook.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import com.em10zyl.cookbook.entity.CookIngredients;
 import com.em10zyl.cookbook.entity.Recipes;
+import com.em10zyl.cookbook.exception.ServiceException;
 import com.em10zyl.cookbook.repository.RecipesMapper;
 import com.em10zyl.cookbook.service.IntegredientsService;
+import com.em10zyl.cookbook.service.RecipeIngredientsService;
 import com.em10zyl.cookbook.service.RecipeService;
+import com.em10zyl.cookbook.util.DataFlow;
+import com.em10zyl.cookbook.util.ParamUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,6 +25,7 @@ import java.util.stream.Collectors;
 public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> implements RecipeService {
     
     private final IntegredientsService integredientsService;
+    private final RecipeIngredientsService recipeIngredientsService;
 
     @Override
     public Recipes getRecipeById(Long recipeId) {
@@ -36,24 +43,38 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Recipes createRecipe(Recipes recipe) {
         save(recipe);
-        List<CookIngredients> ingredients = recipe.getIngredients();
-        if(StrUtil.isNotBlank(ingredients)){
-
-        }
+        DataFlow dataFlow = checkParams(recipe);
+        recipeIngredientsService.saveUpdate(dataFlow.get("ingredients"), recipe.getRecipeId());
         return recipe;
     }
 
+    private DataFlow checkParams(Recipes recipe) {
+        ParamUtil.checkBlank(recipe, false, "recipeName", "description", "steps", "imageUrl", "bilibiliUrl", "isMeat", "isSoup", "cookTime", "difficulty");
+        DataFlow dataFlow = new DataFlow();
+        List<CookIngredients> ingredients = recipe.getIngredients();
+        if(CollUtil.isEmpty(ingredients)){
+            throw new ServiceException("食材不能为空");
+        }
+        dataFlow.put("ingredients", ingredients);
+        return dataFlow;
+    }
+
     @Override
-    public Recipes updateRecipe(Long recipeId, Recipes recipe) {
+    @Transactional(rollbackFor = Exception.class)
+    public Recipes updateRecipe(Integer recipeId, Recipes recipe) {
         recipe.setRecipeId(recipeId);
+        DataFlow dataFlow = checkParams(recipe);
         updateById(recipe);
+        recipeIngredientsService.saveUpdate(dataFlow.get("ingredients"), recipe.getRecipeId());
         return recipe;
     }
 
     @Override
     public void deleteRecipe(Integer recipeId) {
+        recipeIngredientsService.deleteByRecipeId(recipeId);
         removeById(recipeId);
     }
 

@@ -16,7 +16,7 @@ public interface RecipeService extends IService<Recipes> {
 
     Recipes createRecipe(Recipes recipe);
 
-    Recipes updateRecipe(Long recipeId, Recipes recipe);
+    Recipes updateRecipe(Integer recipeId, Recipes recipe);
 
     void deleteRecipe(Integer recipeId);
 

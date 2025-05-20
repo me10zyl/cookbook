@@ -12,6 +12,16 @@ export interface Ingredient {
 }
 
 // 菜谱接口定义
+export interface SelectedIngredient {
+  ingredientId: number;
+  amount: string;
+}
+
+export interface CookingStep {
+  stepNumber: number;
+  description: string;
+}
+
 export interface Recipe {
   recipeId: number;
   recipeName: string;
@@ -23,6 +33,8 @@ export interface Recipe {
   cookTime?: number;
   difficulty?: string;
   steps?: string;
+  selectedIngredients?: SelectedIngredient[];
+  formattedSteps?: CookingStep[];
   matchedIngredients?: string[];
   missingIngredients?: string[];
 }

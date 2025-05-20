@@ -40,4 +40,6 @@ public class CookIngredients {
 
     @TableField(exist = false)
     private boolean isRequired = true;
+    //默认用量
+    private String defaultQuantity;
 }

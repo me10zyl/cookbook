@@ -15,7 +15,7 @@ import java.util.List;
 @TableName(value = "recipes")
 public class Recipes {
     @TableId
-    private Long recipeId;
+    private Integer recipeId;
 
     
     private String recipeName;

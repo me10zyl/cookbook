@@ -34,7 +34,7 @@ public class AdminController {
 
     // 更新菜谱
     @PostMapping("/recipe/update/{recipeId}")
-    public ResponseEntity<Recipes> updateRecipe(@PathVariable Long recipeId, @RequestBody Recipes recipe) {
+    public ResponseEntity<Recipes> updateRecipe(@PathVariable Integer recipeId, @RequestBody Recipes recipe) {
         Recipes updatedRecipe = recipeService.updateRecipe(recipeId, recipe);
         return new ResponseEntity<>(updatedRecipe, HttpStatus.OK);
     }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, Table, Button, Modal, Form, Input, Select, InputNumber, Upload, message, Popconfirm, Switch, Space, Typography } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined, MinusCircleOutlined} from '@ant-design/icons';
 import { Recipe, Ingredient } from '../types';
 
 const { TabPane } = Tabs;
@@ -131,12 +131,23 @@ const RecipeManagement: React.FC = () => {
 
   const handleRecipeFormSubmit = () => {
     recipeForm.validateFields().then(values => {
-      // 这里应该是实际的API调用
-      // 模拟提交操作
+      // 处理烹饪步骤数据
+      const formattedSteps = values.formattedSteps?.map((step: any, index: number) => ({
+        ...step,
+        stepNumber: index + 1
+      }));
+
+      // 构建提交的数据
+      const recipeData = {
+        ...values,
+        formattedSteps,
+        steps: formattedSteps?.map((step: CookingStep) => `${step.stepNumber}. ${step.description}`).join('\n')
+      };
+
       if (editingRecipeId === null) {
         // 新增
         const newRecipe: Recipe = {
-          ...values,
+          ...recipeData,
           recipeId: Math.max(...recipes.map(r => r.recipeId), 0) + 1
         };
         setRecipes([...recipes, newRecipe]);
@@ -145,7 +156,7 @@ const RecipeManagement: React.FC = () => {
         // 编辑
         const updatedRecipes = recipes.map(recipe => {
           if (recipe.recipeId === editingRecipeId) {
-            return { ...recipe, ...values };
+            return { ...recipe, ...recipeData };
           }
           return recipe;
         });
@@ -418,11 +429,76 @@ const RecipeManagement: React.FC = () => {
               </Form.Item>
 
               <Form.Item
-                name="steps"
-                label="烹饪步骤"
-                rules={[{ required: true, message: '请输入烹饪步骤' }]}
+                name="selectedIngredients"
+                label="选择食材"
+                rules={[{ required: true, message: '请选择食材' }]}
               >
-                <Input.TextArea rows={5} placeholder="请输入烹饪步骤，每步一行" />
+                <Form.List name="selectedIngredients">
+                  {(fields, { add, remove }) => (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {fields.map((field, index) => (
+                        <Space key={field.key} align="baseline">
+                          <Form.Item
+                            {...field}
+                            name={[field.name, 'ingredientId']}
+                            rules={[{ required: true, message: '请选择食材' }]}
+                          >
+                            <Select style={{ width: 200 }} placeholder="选择食材">
+                              {ingredients.map(ingredient => (
+                                <Option key={ingredient.ingredientsId} value={ingredient.ingredientsId}>
+                                  {ingredient.ingredientsName}
+                                </Option>
+                              ))}
+                            </Select>
+                          </Form.Item>
+                          <Form.Item
+                            {...field}
+                            name={[field.name, 'amount']}
+                            rules={[{ required: true, message: '请输入用量' }]}
+                          >
+                            <Input placeholder="输入用量" style={{ width: 120 }} />
+                          </Form.Item>
+                          <MinusCircleOutlined onClick={() => remove(field.name)} />
+                        </Space>
+                      ))}
+                      <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                        添加食材
+                      </Button>
+                    </div>
+                  )}
+                </Form.List>
+              </Form.Item>
+
+              <Form.Item
+                name="formattedSteps"
+                label="烹饪步骤"
+                rules={[{ required: true, message: '请添加烹饪步骤' }]}
+              >
+                <Form.List name="formattedSteps">
+                  {(fields, { add, remove }) => (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {fields.map((field, index) => (
+                        <Space key={field.key} align="baseline">
+                          <Form.Item
+                            {...field}
+                            name={[field.name, 'description']}
+                            rules={[{ required: true, message: '请输入步骤描述' }]}
+                          >
+                            <Input.TextArea
+                              placeholder={`第${index + 1}步`}
+                              style={{ width: 400 }}
+                              autoSize={{ minRows: 2, maxRows: 6 }}
+                            />
+                          </Form.Item>
+                          <MinusCircleOutlined onClick={() => remove(field.name)} />
+                        </Space>
+                      ))}
+                      <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                        添加步骤
+                      </Button>
+                    </div>
+                  )}
+                </Form.List>
               </Form.Item>
 
               <div style={{ display: 'flex', gap: '16px' }}>
