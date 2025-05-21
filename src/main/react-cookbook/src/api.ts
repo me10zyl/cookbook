@@ -59,6 +59,11 @@ export const updateRecipe = async (recipeId: number, recipe: any) => {
   return api.post(`/admin/recipe/update/${recipeId}`, recipe);
 };
 
+
+export const getRecipeById = async (recipeId: number) => {
+  return api.get(`/recipes/${recipeId}`);
+}
+
 // 删除菜谱
 export const deleteRecipe = async (recipeId: number) => {
   return api.get(`/admin/recipe/delete/${recipeId}`);

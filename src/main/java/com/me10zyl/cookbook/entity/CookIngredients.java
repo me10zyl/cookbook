@@ -18,13 +18,13 @@ public class CookIngredients {
     private String ingredientsName;
 
 
-    private boolean isMeat;
+    private Boolean isMeat;
 
     
-    private boolean isMain;
+    private Boolean isMain;
 
     
-    private boolean isFlavour;
+    private Boolean isFlavour;
 
     
     private String icon;
@@ -40,6 +40,9 @@ public class CookIngredients {
 
     @TableField(exist = false)
     private boolean isRequired = true;
+    @TableField(exist = false)
+    private Integer riId;
+
     //默认用量
     private String defaultQuantity;
 }

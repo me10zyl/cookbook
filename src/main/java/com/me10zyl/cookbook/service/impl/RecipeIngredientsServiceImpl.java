@@ -7,6 +7,7 @@ import com.me10zyl.cookbook.exception.ServiceException;
 import com.me10zyl.cookbook.repository.RecipeIngredientsMapper;
 import com.me10zyl.cookbook.service.RecipeIngredientsService;
 import com.me10zyl.cookbook.util.DiffUtil;
+import com.me10zyl.cookbook.util.ParamUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,10 +18,18 @@ import static com.me10zyl.cookbook.util.StreamUtil.mapId;
 public class RecipeIngredientsServiceImpl  extends ServiceImpl<RecipeIngredientsMapper, RecipeIngredients> implements RecipeIngredientsService {
     @Override
     public void saveUpdate(List<CookIngredients> ingredients, Integer recipeId) {
+        for (CookIngredients ingredient : ingredients) {
+            ParamUtil.checkBlank(ingredient, false, "quantity");
+        }
         List<RecipeIngredients> recipeIngredients = listByRecipeId(recipeId);
         DiffUtil.diff(mapId(ingredients, e->{
-            return new RecipeIngredients().setIngredientId(e.getIngredientsId()).setRecipeId(recipeId);
-        }), recipeIngredients, RecipeIngredients::getIngredientId)
+            return new RecipeIngredients()
+                    .setIngredientsId(e.getIngredientsId())
+                    .setRecipeId(recipeId)
+                    .setRiId(e.getRiId())
+                    .setQuantity(e.getQuantity())
+                    ;
+        }), recipeIngredients, RecipeIngredients::getIngredientsId)
                 .applyPatch(this);
     }
 
@@ -31,7 +40,7 @@ public class RecipeIngredientsServiceImpl  extends ServiceImpl<RecipeIngredients
 
     @Override
     public void checkRelationship(Integer ingredientId) {
-        if(lambdaQuery().eq(RecipeIngredients::getIngredientId, ingredientId).count() > 0){
+        if(lambdaQuery().eq(RecipeIngredients::getIngredientsId, ingredientId).count() > 0){
             throw new ServiceException("该食材被使用，无法删除");
         }
     }

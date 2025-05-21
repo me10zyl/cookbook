@@ -1,5 +1,6 @@
 package com.me10zyl.cookbook.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -8,8 +9,10 @@ import lombok.experimental.Accessors;
 @TableName(value = "recipe_ingredients")
 @Accessors(chain = true)
 public class RecipeIngredients {
+    @TableId
+    private Integer riId;
     private Integer recipeId;
-    private Integer ingredientId;
+    private Integer ingredientsId;
     private String quantity;
     private boolean isRequired  ;
 }

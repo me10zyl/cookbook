@@ -3,14 +3,14 @@ import { Tabs, Table, Button, Modal, Form, Input, Select, InputNumber, Upload, m
 import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined, MinusCircleOutlined} from '@ant-design/icons';
 import { Recipe, Ingredient } from '../types';
 import {
-  createRecipe, 
-  deleteIngredient, 
-  updateRecipe, 
-  deleteRecipe, 
-  getAllIngredients, 
-  createIngredient, 
+  createRecipe,
+  deleteIngredient,
+  updateRecipe,
+  deleteRecipe,
+  getAllIngredients,
+  createIngredient,
   updateIngredient,
-  getAllRecipes
+  getAllRecipes, getRecipeById
 } from '../api.ts';
 
 const { TabPane } = Tabs;
@@ -66,6 +66,7 @@ const RecipeManagement: React.FC = () => {
 
   const handleEditRecipe = async (record: Recipe) => {
     setEditingRecipeId(record.recipeId);
+    record = (await getRecipeById(record.recipeId)).data;
     recipeForm.setFieldsValue({
       recipeName: record.recipeName,
       description: record.description,
@@ -75,7 +76,8 @@ const RecipeManagement: React.FC = () => {
       isSoup: record.isSoup,
       cookTime: record.cookTime,
       difficulty: record.difficulty,
-      steps: record.steps
+      formattedSteps: JSON.parse(record.steps),
+      ingredients: record.ingredients
     });
     setRecipeModalVisible(true);
   };
@@ -212,13 +214,13 @@ const RecipeManagement: React.FC = () => {
       title: '是否荤菜',
       dataIndex: 'isMeat',
       key: 'isMeat',
-      render: (isMeat: number) => isMeat === 1 ? '是' : '否',
+      render: (isMeat: boolean) => isMeat  ? '是' : '否',
     },
     {
       title: '是否汤类',
       dataIndex: 'isSoup',
       key: 'isSoup',
-      render: (isSoup: number) => isSoup === 1 ? '是' : '否',
+      render: (isSoup: boolean) => isSoup ? '是' : '否',
     },
     {
       title: '烹饪时间',
@@ -279,19 +281,19 @@ const RecipeManagement: React.FC = () => {
       title: '是否荤类',
       dataIndex: 'isMeat',
       key: 'isMeat',
-      render: (isMeat: number) => isMeat === 1 ? '是' : '否',
+      render: (isMeat: boolean) => isMeat  ? '是' : '否',
     },
     {
-      title: '是否主料',
+      title: '是否主食',
       dataIndex: 'isMain',
       key: 'isMain',
-      render: (isMain: number) => isMain === 1 ? '是' : '否',
+      render: (isMain: boolean) => isMain  ? '是' : '否',
     },
     {
       title: '是否调料',
       dataIndex: 'isFlavour',
       key: 'isFlavour',
-      render: (isFlavour: number) => isFlavour === 1 ? '是' : '否',
+      render: (isFlavour: boolean) => isFlavour ? '是' : '否',
     },
     {
       title: '默认用量',
@@ -479,8 +481,8 @@ const RecipeManagement: React.FC = () => {
                   style={{ flex: 1 }}
                 >
                   <Select placeholder="请选择">
-                    <Option value={1}>是</Option>
-                    <Option value={0}>否</Option>
+                    <Option value={true}>是</Option>
+                    <Option value={false}>否</Option>
                   </Select>
                 </Form.Item>
 
@@ -491,8 +493,8 @@ const RecipeManagement: React.FC = () => {
                   style={{ flex: 1 }}
                 >
                   <Select placeholder="请选择">
-                    <Option value={1}>是</Option>
-                    <Option value={0}>否</Option>
+                    <Option value={true}>是</Option>
+                    <Option value={false}>否</Option>
                   </Select>
                 </Form.Item>
               </div>

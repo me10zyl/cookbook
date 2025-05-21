@@ -12,6 +12,6 @@ import java.util.List;
 public class IntegredientsServiceImpl extends ServiceImpl<CookIngredientsMapper, CookIngredients> implements IntegredientsService {
     @Override
     public List<CookIngredients> findByRecipeId(Long recipeId) {
-        return List.of();
+        return baseMapper.findByRecipeId(recipeId);
     }
 }
