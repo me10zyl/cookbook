@@ -10,7 +10,7 @@ import {
   getAllIngredients,
   createIngredient,
   updateIngredient,
-  getAllRecipes, getRecipeById
+  getAllRecipes, getRecipeDetails
 } from '../api.ts';
 import {showSuccess, showError} from "../util/messageService.ts";
 
@@ -67,7 +67,7 @@ const RecipeManagement: React.FC = () => {
 
   const handleEditRecipe = async (record: Recipe) => {
     setEditingRecipeId(record.recipeId);
-    record = (await getRecipeById(record.recipeId)).data;
+    record = (await getRecipeDetails(record.recipeId)).data;
     recipeForm.setFieldsValue({
       recipeName: record.recipeName,
       description: record.description,

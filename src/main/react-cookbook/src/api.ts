@@ -59,11 +59,6 @@ export const updateRecipe = async (recipeId: number, recipe: any) => {
   return api.post(`/admin/recipe/update/${recipeId}`, recipe);
 };
 
-
-export const getRecipeById = async (recipeId: number) => {
-  return api.get(`/recipes/${recipeId}`);
-}
-
 // 删除菜谱
 export const deleteRecipe = async (recipeId: number) => {
   return api.get(`/admin/recipe/delete/${recipeId}`);
@@ -84,6 +79,29 @@ export const updateIngredient = async (ingredientId: number, ingredient: any) =>
   return api.put(`/admin/ingredients/update/${ingredientId}`, ingredient);
 };
 
-export const getAllRecipes = async () => {
-  return api.get('/recipes/list');
+// 获取所有菜谱
+export const getAllRecipes = async (name?: string) => {
+  const params = name ? { name } : {};
+  return api.get('/recipes/list', { params });
+};
+
+// 菜谱展示页面
+export const getRecipeDetails = async (recipeId: number) => {
+  return api.get(`/recipes/${recipeId}`);
+};
+
+// 食材匹配菜谱页面
+export const matchRecipesByIngredients = async (ingredientIds: number[], isMeat?: boolean) => {
+  return api.post('/recipes/match', ingredientIds, { params: { isMeat } });
+};
+
+// 菜谱反查食材页面
+export const getIngredientsByRecipe = async (recipeId: number) => {
+  return api.get(`/recipes/${recipeId}/ingredients`);
+};
+
+// 每日随机菜谱推荐页面
+export const getDailyRecommendations = async (preference?: string) => {
+  const params = preference ? { preference } : {};
+  return api.get('/recipes/daily-recommendations', { params });
 };
