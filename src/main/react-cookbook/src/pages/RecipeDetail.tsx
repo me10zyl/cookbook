@@ -3,92 +3,64 @@ import { useParams } from 'react-router-dom';
 import { Typography, Divider, Tag, List, Steps, Button, Row, Col, Card, Spin, Empty } from 'antd';
 import { PlayCircleOutlined, ClockCircleOutlined, FireOutlined } from '@ant-design/icons';
 import { Recipe, Ingredient, GroupedIngredients } from '../types';
+import { getRecipeDetails, getIngredientsByRecipe } from '../api.ts';
 
 const { Title, Paragraph } = Typography;
 
-interface RecipeDetailParams {
-  id: string;
-}
 
 interface RecipeDetailProps {
   recipe?: Recipe;
 }
 
 const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe: propRecipe }) => {
-  const { id } = useParams<RecipeDetailParams>();
   const [recipe, setRecipe] = useState<Recipe | null>(propRecipe || null);
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [loading, setLoading] = useState<boolean>(propRecipe ? false : true);
+  const [groupedIngredients , setGroupedIngredients] = useState<GroupedIngredients>({
+    main: [],
+    meat: [],
+    flavour: [],
+    other: []
+  });
+  const [stepsArray, setStepsArray] = useState<string[]>([]);
 
   // 从API获取菜谱详情数据
   useEffect(() => {
-    // 如果已经从props接收到了菜谱数据，则不需要再次获取
-    if (propRecipe) {
-      setRecipe(propRecipe);
-      // 获取该菜谱的食材数据
-      fetchIngredients(propRecipe.recipeId);
-      return;
-    }
-    
-    // 如果没有props数据但有id参数，则通过id获取数据
-    if (id) {
-      // 这里应该是实际的API调用
-      // 模拟数据加载
-      setTimeout(() => {
-        // 模拟菜谱数据
-        const mockRecipe: Recipe = {
-          recipeId: parseInt(id),
-          recipeName: '红烧肉',
-          description: '红烧肉是一道色香味俱全的传统名菜，在我国各大菜系中都有自己特色的红烧肉。红烧肉的烹饪技术以砂锅为主，肥瘦相间，香甜松软，入口即化。',
-          steps: '1. 猪肉切块，冷水下锅焯水去血水和杂质\n2. 锅中放油，下冰糖小火炒至融化呈棕色\n3. 放入肉块翻炒至肉块均匀上色\n4. 加入料酒、生抽、老抽、八角、桂皮等调料\n5. 加入没过肉的开水，大火烧开后转小火慢炖1小时\n6. 调入盐和糖，收汁即可',
-          imageUrl: 'https://via.placeholder.com/600x400?text=红烧肉',
-          bilibiliUrl: 'https://www.bilibili.com/video/sample1',
-          isMeat: 1,
-          isSoup: 0,
-          cookTime: 90,
-          difficulty: '中等'
-        };
+    const fetchData = async () => {
+      try {
+        if (propRecipe.recipeId) {
+          const recipeResponse = await getRecipeDetails(propRecipe.recipeId);
+          const recipe = recipeResponse.data;
+          setRecipe(recipe);
+          console.log('recipe:', recipe);
+          const stepsArray = getStepsArray(recipe.steps);
+          const groupedIngredients = doGroupIngredients(recipe.ingredients);
+          setStepsArray(stepsArray);
+          setGroupedIngredients(groupedIngredients);
+          console.log('groupedIngredients:', groupedIngredients);
+        }
+      } catch (error) {
+        console.error('获取数据失败:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-        setRecipe(mockRecipe);
-        fetchIngredients(mockRecipe.recipeId);
-      }, 1000);
-    }
-  }, [id, propRecipe]);
-  
-  // 获取食材数据的函数
-  const fetchIngredients = (recipeId: number) => {
-    // 这里应该是实际的API调用获取食材数据
-    // 模拟食材数据
-    setTimeout(() => {
-      const mockIngredients: Ingredient[] = [
-        { ingredientsId: 1, ingredientsName: '五花肉', quantity: '500g', isRequired: 1, isMeat: 1, isMain: 1, isFlavour: 0 },
-        { ingredientsId: 2, ingredientsName: '生抽', quantity: '2勺', isRequired: 1, isMeat: 0, isMain: 0, isFlavour: 1 },
-        { ingredientsId: 3, ingredientsName: '老抽', quantity: '1勺', isRequired: 1, isMeat: 0, isMain: 0, isFlavour: 1 },
-        { ingredientsId: 4, ingredientsName: '冰糖', quantity: '30g', isRequired: 1, isMeat: 0, isMain: 0, isFlavour: 1 },
-        { ingredientsId: 5, ingredientsName: '八角', quantity: '2个', isRequired: 0, isMeat: 0, isMain: 0, isFlavour: 1 },
-        { ingredientsId: 6, ingredientsName: '桂皮', quantity: '1小块', isRequired: 0, isMeat: 0, isMain: 0, isFlavour: 1 },
-        { ingredientsId: 7, ingredientsName: '料酒', quantity: '1勺', isRequired: 1, isMeat: 0, isMain: 0, isFlavour: 1 },
-        { ingredientsId: 8, ingredientsName: '盐', quantity: '适量', isRequired: 1, isMeat: 0, isMain: 0, isFlavour: 1 },
-      ];
-      
-      setIngredients(mockIngredients);
-      setLoading(false);
-    }, 500);
-  };
+    fetchData();
+  }, [propRecipe]);
 
   // 将步骤文本转换为数组
   const getStepsArray = (stepsText?: string): string[] => {
     if (!stepsText) return [];
-    return stepsText.split('\n').map(step => step.trim()).filter(step => step);
+    return JSON.parse(stepsText);
   };
 
   // 根据食材类型进行分组
-  const groupIngredients = (ingredients: Ingredient[]): GroupedIngredients => {
+  const doGroupIngredients = (ingredients: Ingredient[]): GroupedIngredients => {
     const groups: GroupedIngredients = {
-      main: ingredients.filter(item => item.isMain === 1),
-      meat: ingredients.filter(item => item.isMeat === 1 && item.isMain === 0),
-      flavour: ingredients.filter(item => item.isFlavour === 1),
-      other: ingredients.filter(item => item.isMain === 0 && item.isMeat === 0 && item.isFlavour === 0)
+      main: ingredients.filter(item => item.isMain),
+      meat: ingredients.filter(item => item.isMeat),
+      flavour: ingredients.filter(item => item.isFlavour),
+      other: ingredients.filter(item => !item.isMain && !item.isMeat && !item.isFlavour)
     };
     return groups;
   };
@@ -105,8 +77,7 @@ const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe: propRecipe }) => {
     return <Empty description="未找到菜谱" />;
   }
 
-  const stepsArray = getStepsArray(recipe.steps);
-  const groupedIngredients = groupIngredients(ingredients);
+
 
   return (
     <div className="recipe-detail-container">
@@ -147,8 +118,8 @@ const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe: propRecipe }) => {
             direction="vertical" 
             current={-1} 
             items={stepsArray.map((step, index) => ({
-              title: `步骤 ${index + 1}`,
-              description: step.replace(/^\d+\.\s*/, '')
+              title: `步骤 ${step.stepNumber}`,
+              description: step ? step.description.replace(/^\d+\.\s*/, '') : ''
             }))}
           />
         </Col>

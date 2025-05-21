@@ -4,6 +4,7 @@ import { Row, Col, Card, Typography, Spin, Empty, Menu, Layout, Divider, Button 
 import { RightOutlined, BookOutlined, FireOutlined, CoffeeOutlined, BulbOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import RecipeDetail from './RecipeDetail.tsx';
 import { Recipe } from '../types';
+import { getAllRecipes } from '../api.ts';
 
 const { Title, Paragraph } = Typography;
 const { Meta } = Card;
@@ -14,65 +15,23 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
-  // 模拟从API获取菜谱数据
+  // 从API获取菜谱数据
   useEffect(() => {
-    // 这里应该是实际的API调用
-    // 模拟数据加载
-    setTimeout(() => {
-      // 模拟菜谱数据
-      const mockRecipes: Recipe[] = [
-        {
-          recipeId: 1,
-          recipeName: '红烧肉',
-          description: '经典家常菜，肥而不腻，口感醇厚',
-          imageUrl: 'https://via.placeholder.com/300x200?text=红烧肉',
-          bilibiliUrl: 'https://www.bilibili.com/video/sample1',
-          isMeat: 1,
-          isSoup: 0,
-          cookTime: 60,
-          difficulty: '中等'
-        },
-        {
-          recipeId: 2,
-          recipeName: '西红柿炒鸡蛋',
-          description: '简单易做的家常菜，酸甜可口',
-          imageUrl: 'https://via.placeholder.com/300x200?text=西红柿炒鸡蛋',
-          bilibiliUrl: 'https://www.bilibili.com/video/sample2',
-          isMeat: 1,
-          isSoup: 0,
-          cookTime: 15,
-          difficulty: '简单'
-        },
-        {
-          recipeId: 3,
-          recipeName: '紫菜蛋花汤',
-          description: '营养丰富的家常汤品',
-          imageUrl: 'https://via.placeholder.com/300x200?text=紫菜蛋花汤',
-          bilibiliUrl: 'https://www.bilibili.com/video/sample3',
-          isMeat: 0,
-          isSoup: 1,
-          cookTime: 20,
-          difficulty: '简单'
-        },
-        {
-          recipeId: 4,
-          recipeName: '麻婆豆腐',
-          description: '川菜经典，麻辣鲜香',
-          imageUrl: 'https://via.placeholder.com/300x200?text=麻婆豆腐',
-          bilibiliUrl: 'https://www.bilibili.com/video/sample4',
-          isMeat: 1,
-          isSoup: 0,
-          cookTime: 30,
-          difficulty: '中等'
-        },
-      ];
-      setRecipes(mockRecipes);
-      // 默认选中第一个菜谱
-      if (mockRecipes.length > 0) {
-        setSelectedRecipe(mockRecipes[0]);
+    const fetchRecipes = async () => {
+      try {
+        const response = await getAllRecipes();
+        setRecipes(response.data);
+        if (response.data.length > 0) {
+          setSelectedRecipe(response.data[0]);
+        }
+      } catch (error) {
+        console.error('获取菜谱数据失败:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    }, 1000);
+    };
+
+    fetchRecipes();
   }, []);
 
   // 处理菜谱选择

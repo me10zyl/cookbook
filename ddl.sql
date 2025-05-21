@@ -20,15 +20,29 @@ create table cook_ingredients
 
 
 -- auto-generated definition
+create table recipe_ingredients
+(
+    ri_id          int auto_increment
+        primary key,
+    recipe_id      int         not null,
+    ingredients_id int         not null,
+    quantity       varchar(50) null comment '食材用量（如“100g”）',
+    constraint recipe_ingredients_pk_2
+        unique (recipe_id, ingredients_id)
+)
+    comment '菜谱与食材的关联表';
+
+
+-- auto-generated definition
 create table recipes
 (
     recipe_id    bigint auto_increment
         primary key,
     recipe_name  varchar(100)                                            not null comment '菜谱名称',
     description  text                                                    null comment '菜谱描述',
-    steps        text                                                    not null comment '烹饪步骤',
+    steps        json                                                    not null comment '烹饪步骤',
     image_url    varchar(255)                                            null comment '菜谱图片URL',
-    bilibili_url varchar(255)                                            not null comment 'Bilibili视频链接',
+    bilibili_url varchar(255)                                            null comment 'Bilibili视频链接',
     is_meat      tinyint(1)                                              not null comment '是否是荤菜 1 是 0 否 ',
     is_soup      tinyint(1)                                              not null comment '是否是汤 1 是 0 否 ',
     cook_time    int                                                     null comment '烹饪时间（分钟）',
@@ -41,17 +55,4 @@ create table recipes
 create index idx_cook_time
     on recipes (cook_time);
 
--- auto-generated definition
-create table recipe_ingredients
-(
-    recipe_id     int                  not null,
-    ingredient_id int                  not null,
-    quantity      varchar(50)          null comment '食材用量（如“100g”）',
-    is_required   tinyint(1) default 1 null comment '是否为必需食材 1 是 0 否',
-    primary key (recipe_id, ingredient_id)
-)
-    comment '菜谱与食材的关联表';
-
-create index idx_ingredient_id
-    on recipe_ingredients (ingredient_id);
 

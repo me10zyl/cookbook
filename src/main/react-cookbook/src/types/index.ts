@@ -4,11 +4,11 @@
 export interface Ingredient {
   ingredientsId: number;
   ingredientsName: string;
-  isMeat: number;
-  isMain: number;
-  isFlavour: number;
+  isMeat: boolean;
+  isMain: boolean;
+  isFlavour: boolean;
   quantity?: string;
-  isRequired?: number;
+  isRequired?: boolean;
   defaultQuantity: string;
 }
 
