@@ -3,6 +3,7 @@ package com.me10zyl.cookbook.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.me10zyl.cookbook.entity.CookIngredients;
 import com.me10zyl.cookbook.entity.RecipeIngredients;
+import com.me10zyl.cookbook.exception.ServiceException;
 import com.me10zyl.cookbook.repository.RecipeIngredientsMapper;
 import com.me10zyl.cookbook.service.RecipeIngredientsService;
 import com.me10zyl.cookbook.util.DiffUtil;
@@ -26,6 +27,13 @@ public class RecipeIngredientsServiceImpl  extends ServiceImpl<RecipeIngredients
     @Override
     public void deleteByRecipeId(Integer recipeId) {
         lambdaUpdate().eq(RecipeIngredients::getRecipeId, recipeId).remove();
+    }
+
+    @Override
+    public void checkRelationship(Integer ingredientId) {
+        if(lambdaQuery().eq(RecipeIngredients::getIngredientId, ingredientId).count() > 0){
+            throw new ServiceException("该食材被使用，无法删除");
+        }
     }
 
     private List<RecipeIngredients> listByRecipeId(Integer recipeId) {

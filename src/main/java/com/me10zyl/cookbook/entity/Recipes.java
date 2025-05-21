@@ -33,10 +33,10 @@ public class Recipes {
     private String bilibiliUrl;
 
     
-    private boolean isMeat;
+    private Boolean isMeat;
 
     
-    private boolean isSoup;
+    private Boolean isSoup;
 
     
     private Integer cookTime;

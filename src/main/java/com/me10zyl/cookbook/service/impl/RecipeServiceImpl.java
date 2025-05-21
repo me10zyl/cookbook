@@ -52,7 +52,7 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
     }
 
     private DataFlow checkParams(Recipes recipe) {
-        ParamUtil.checkBlank(recipe, false, "recipeName", "description", "steps", "imageUrl", "bilibiliUrl", "isMeat", "isSoup", "cookTime", "difficulty");
+        ParamUtil.checkBlank(recipe, false, "recipeName", "ingredients", "description", "steps", "imageUrl",  "isMeat", "isSoup", "cookTime", "difficulty");
         DataFlow dataFlow = new DataFlow();
         List<CookIngredients> ingredients = recipe.getIngredients();
         if(CollUtil.isEmpty(ingredients)){
@@ -80,10 +80,10 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
 
     @Override
     public List<Recipes> getAllRecipes(String name) {
-        if (StrUtil.isNotBlank(name)) {
-            return lambdaQuery().like(Recipes::getRecipeName, name).list();
-        }
-        return list();
+        return lambdaQuery()
+                .select(Recipes::getRecipeId, Recipes::getRecipeName, Recipes::getDescription
+                        , Recipes::getIsMeat, Recipes::getIsSoup, Recipes::getCookTime, Recipes::getDifficulty)
+                .like(StrUtil.isNotBlank(name), Recipes::getRecipeName, name).list();
     }
 
     @Override
@@ -101,6 +101,7 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
 
     @Override
     public void deleteIngredient(Integer ingredientId) {
+        recipeIngredientsService.checkRelationship(ingredientId);
         integredientsService.removeById(ingredientId);
     }
 
@@ -130,7 +131,7 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
                     break;
                 case "素食":
                     filteredRecipes = allRecipes.stream()
-                            .filter(recipe -> !recipe.isMeat())
+                            .filter(recipe -> !recipe.getIsMeat())
                             .collect(Collectors.toList());
                     break;
                 case "快速烹饪":
@@ -143,9 +144,9 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
         
         // 随机选择多道菜谱，保证类型均衡
         Map<String, List<Recipes>> categorizedRecipes = new HashMap<>();
-        categorizedRecipes.put("荤菜", filteredRecipes.stream().filter(Recipes::isMeat).collect(Collectors.toList()));
-        categorizedRecipes.put("素菜", filteredRecipes.stream().filter(recipe -> !recipe.isMeat()).collect(Collectors.toList()));
-        categorizedRecipes.put("汤品", filteredRecipes.stream().filter(Recipes::isSoup).collect(Collectors.toList()));
+        categorizedRecipes.put("荤菜", filteredRecipes.stream().filter(Recipes::getIsMeat).collect(Collectors.toList()));
+        categorizedRecipes.put("素菜", filteredRecipes.stream().filter(recipe -> !recipe.getIsMeat()).collect(Collectors.toList()));
+        categorizedRecipes.put("汤品", filteredRecipes.stream().filter(Recipes::getIsSoup).collect(Collectors.toList()));
 
         List<Recipes> recommendations = new ArrayList<>();
         Random random = new Random();

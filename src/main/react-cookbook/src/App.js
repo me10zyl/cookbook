@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Layout, Menu, Typography } from 'antd';
+import {Layout, Menu, message, Typography} from 'antd';
 import { HomeOutlined, SearchOutlined, BookOutlined, CalendarOutlined, SettingOutlined } from '@ant-design/icons';
 import './App.css';
 
@@ -11,13 +11,22 @@ import RecipeIngredients from './pages/RecipeIngredients.tsx';
 import DailyRecommendation from './pages/DailyRecommendation.tsx';
 import Home from './pages/Home.tsx';
 import RecipeManagement from './pages/RecipeManagement.tsx';
+import {setMessageApi} from "./util/messageService.ts";
 
 const { Header, Content, Footer } = Layout;
 const { Title } = Typography;
 
 function App() {
+  const [messageApi, contextHolder] =
+      message.useMessage();
+
+  // 在组件加载时设置 message api
+  React.useEffect(() => {
+    setMessageApi(messageApi);
+  }, [messageApi]);
   return (
     <Router>
+      {contextHolder}
       <Layout className="layout" style={{ minHeight: '100vh' }}>
         <Header className="header">
           <div className="logo">

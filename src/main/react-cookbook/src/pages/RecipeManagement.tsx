@@ -104,7 +104,7 @@ const RecipeManagement: React.FC = () => {
         const recipeData = {
           ...values,
           formattedSteps,
-          steps: formattedSteps?.map((step: any) => `${step.stepNumber}. ${step.description}`).join('\n')
+          steps: JSON.stringify(formattedSteps)
         };
 
         if (editingRecipeId === null) {
@@ -295,8 +295,8 @@ const RecipeManagement: React.FC = () => {
     },
     {
       title: '默认用量',
-      dataIndex: 'quantity',
-      key: 'quantity',
+      dataIndex: 'defaultQuantity',
+      key: 'defaultQuantity',
     },
     {
       title: '操作',
@@ -399,18 +399,18 @@ const RecipeManagement: React.FC = () => {
               </Form.Item>
 
               <Form.Item
-                name="selectedIngredients"
+                name="ingredients"
                 label="选择食材"
                 rules={[{ required: true, message: '请选择食材' }]}
               >
-                <Form.List name="selectedIngredients">
+                <Form.List name="ingredients">
                   {(fields, { add, remove }) => (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {fields.map((field, index) => (
                         <Space key={field.key} align="baseline">
                           <Form.Item
                             {...field}
-                            name={[field.name, 'ingredientId']}
+                            name={[field.name, 'ingredientsId']}
                             rules={[{ required: true, message: '请选择食材' }]}
                           >
                             <Select style={{ width: 200 }} placeholder="选择食材">
@@ -423,7 +423,7 @@ const RecipeManagement: React.FC = () => {
                           </Form.Item>
                           <Form.Item
                             {...field}
-                            name={[field.name, 'amount']}
+                            name={[field.name, 'quantity']}
                             rules={[{ required: true, message: '请输入用量' }]}
                           >
                             <Input placeholder="输入用量" style={{ width: 120 }} />
@@ -600,7 +600,7 @@ const RecipeManagement: React.FC = () => {
               </div>
 
               <Form.Item
-                name="quantity"
+                name="defaultQuantity"
                 label="默认用量"
                 rules={[{ required: true, message: '请输入默认用量' }]}
               >

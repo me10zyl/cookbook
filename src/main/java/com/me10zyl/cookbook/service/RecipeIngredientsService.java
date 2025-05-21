@@ -10,4 +10,6 @@ public interface RecipeIngredientsService extends IService<RecipeIngredients> {
     void saveUpdate(List<CookIngredients> ingredients, Integer recipeId);
 
     void deleteByRecipeId(Integer recipeId);
+
+    void checkRelationship(Integer ingredientId);
 }

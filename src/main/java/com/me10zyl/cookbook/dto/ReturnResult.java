@@ -15,10 +15,10 @@ public class ReturnResult<T> {
         return tReturnResult;
     }
 
-    public static <T> ReturnResult<T> fail(T data) {
+    public static <T> ReturnResult<T> fail(String data) {
         ReturnResult<T> tReturnResult = new ReturnResult<>();
         tReturnResult.success = false;
-        tReturnResult.data = data;
+        tReturnResult.message = data;
         return tReturnResult;
     }
 }
