@@ -96,8 +96,8 @@ export const getRecipeDetails = async (recipeId: number) => {
 };
 
 // 食材匹配菜谱页面
-export const matchRecipesByIngredients = async (ingredientIds: number[], isMeat?: boolean) => {
-  return api.post('/recipes/match', ingredientIds, { params: { isMeat } });
+export const matchRecipes = async (ingredientIds: number[], isMeat?: boolean) => {
+  return api.post('/recipes/matchRecipes', ingredientIds, { params: { isMeat } });
 };
 
 

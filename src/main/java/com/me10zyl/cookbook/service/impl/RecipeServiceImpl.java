@@ -13,6 +13,7 @@ import com.me10zyl.cookbook.service.RecipeIngredientsService;
 import com.me10zyl.cookbook.service.RecipeService;
 import com.me10zyl.cookbook.util.DataFlow;
 import com.me10zyl.cookbook.util.ParamUtil;
+import com.me10zyl.cookbook.util.StreamUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
     private final RecipeIngredientsService recipeIngredientsService;
 
     @Override
-    public Recipes getRecipeById(Long recipeId) {
+    public Recipes getRecipeById(Integer recipeId) {
         Recipes recipe = getById(recipeId);
         if (recipe == null) {
             return null;
@@ -46,7 +47,7 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
         Map<String, CookIngredients> ingredientMap = new HashMap<>();
         for (Integer recipeId : recipeIds) {
             // 获取每个菜谱的食材列表
-            List<CookIngredients> ingredients = integredientsService.findByRecipeId(recipeId.longValue());
+            List<CookIngredients> ingredients = integredientsService.findByRecipeId(recipeId);
             if (ingredients != null) {
                 for (CookIngredients ingredient : ingredients) {
                     String ingredientName = ingredient.getIngredientsName();
@@ -196,7 +197,15 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
 
     @Override
     public List<Recipes> matchRecipes(List<Integer> ingredientIds) {
-        return baseMapper.findRecipesByIngredients(ingredientIds);
+        List<Recipes> recipesByIngredients = baseMapper.findRecipesByIngredients(ingredientIds);
+        recipesByIngredients.forEach(recipe -> {
+            List<CookIngredients> ingredients = integredientsService.findByRecipeId(recipe.getRecipeId());
+            recipe.setMatchedIngredients(StreamUtil.filter(ingredients,e-> ingredientIds.contains(e.getIngredientsId()))
+                    .stream().map(CookIngredients::getIngredientsName).collect(Collectors.toList()));
+            recipe.setMissingIngredients(StreamUtil.filter(ingredients,e-> !ingredientIds.contains(e.getIngredientsId()))
+                    .stream().map(CookIngredients::getIngredientsName).collect(Collectors.toList()));
+        });
+        return recipesByIngredients;
     }
 
     @Override

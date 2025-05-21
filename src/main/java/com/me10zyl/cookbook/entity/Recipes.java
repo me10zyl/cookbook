@@ -51,7 +51,6 @@ public class Recipes {
     private Timestamp updatedAt;
 
     @TableField(exist = false)
-
     List<CookIngredients> ingredients;
 
     @AllArgsConstructor
@@ -66,4 +65,9 @@ public class Recipes {
             return value;
         }
     }
+
+    @TableField(exist = false)
+    List<String> matchedIngredients;
+    @TableField(exist = false)
+    List<String>   missingIngredients;
 }

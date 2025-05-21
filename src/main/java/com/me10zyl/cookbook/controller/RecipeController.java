@@ -19,7 +19,7 @@ public class RecipeController {
 
     // 菜谱展示页面
     @GetMapping("/{recipeId}")
-    public ResponseEntity<Recipes> getRecipeDetails(@PathVariable Long recipeId) {
+    public ResponseEntity<Recipes> getRecipeDetails(@PathVariable Integer recipeId) {
         Recipes recipe = recipeService.getRecipeById(recipeId);
         return new ResponseEntity<>(recipe, HttpStatus.OK);
     }

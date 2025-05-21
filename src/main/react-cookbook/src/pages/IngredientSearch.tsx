@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Typography, Select, Card, Row, Col, Button, Tag, Divider, Empty, Spin, Switch } from 'antd';
 import { SearchOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { Ingredient, Recipe } from '../types';
+import { getAllIngredients, matchRecipes } from '../api.ts';
 
 const { Title, Paragraph } = Typography;
 const { Meta } = Card;
@@ -22,27 +23,20 @@ const IngredientSearch: React.FC = () => {
   const [onlyMeat, setOnlyMeat] = useState<boolean>(false);
   const [onlyVegetarian, setOnlyVegetarian] = useState<boolean>(false);
 
-  // 模拟从API获取所有食材数据
+  // 从 API 获取所有食材数据
   useEffect(() => {
-    // 这里应该是实际的API调用
-    setTimeout(() => {
-      const mockIngredients: Ingredient[] = [
-        { ingredientsId: 1, ingredientsName: '五花肉', isMeat: 1, isMain: 1, isFlavour: 0 },
-        { ingredientsId: 2, ingredientsName: '鸡蛋', isMeat: 1, isMain: 1, isFlavour: 0 },
-        { ingredientsId: 3, ingredientsName: '西红柿', isMeat: 0, isMain: 1, isFlavour: 0 },
-        { ingredientsId: 4, ingredientsName: '豆腐', isMeat: 0, isMain: 1, isFlavour: 0 },
-        { ingredientsId: 5, ingredientsName: '青椒', isMeat: 0, isMain: 1, isFlavour: 0 },
-        { ingredientsId: 6, ingredientsName: '土豆', isMeat: 0, isMain: 1, isFlavour: 0 },
-        { ingredientsId: 7, ingredientsName: '洋葱', isMeat: 0, isMain: 1, isFlavour: 0 },
-        { ingredientsId: 8, ingredientsName: '胡萝卜', isMeat: 0, isMain: 1, isFlavour: 0 },
-        { ingredientsId: 9, ingredientsName: '生抽', isMeat: 0, isMain: 0, isFlavour: 1 },
-        { ingredientsId: 10, ingredientsName: '老抽', isMeat: 0, isMain: 0, isFlavour: 1 },
-        { ingredientsId: 11, ingredientsName: '盐', isMeat: 0, isMain: 0, isFlavour: 1 },
-        { ingredientsId: 12, ingredientsName: '糖', isMeat: 0, isMain: 0, isFlavour: 1 },
-      ];
-      setIngredients(mockIngredients);
-      setLoading(false);
-    }, 1000);
+    const fetchIngredients = async () => {
+      try {
+        const response = await getAllIngredients();
+        setIngredients(response.data);
+      } catch (error) {
+        console.error('获取食材数据失败:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchIngredients();
   }, []);
 
   // 处理食材选择变化
@@ -67,60 +61,29 @@ const IngredientSearch: React.FC = () => {
   };
 
   // 搜索匹配菜谱
-  const searchRecipes = (): void => {
+  const searchRecipes = async (): Promise<void> => {
     if (selectedIngredients.length === 0) {
       return;
     }
 
     setSearchLoading(true);
-    // 这里应该是实际的API调用，根据选择的食材和筛选条件查询匹配的菜谱
-    setTimeout(() => {
-      // 模拟匹配结果
-      const mockMatchedRecipes: MatchedRecipe[] = [
-        {
-          recipeId: 1,
-          recipeName: '红烧肉',
-          description: '经典家常菜，肥而不腻，口感醇厚',
-          imageUrl: 'https://via.placeholder.com/300x200?text=红烧肉',
-          isMeat: 1,
-          isSoup: 0,
-          matchedIngredients: ['五花肉'],
-          missingIngredients: ['生抽', '老抽', '冰糖', '八角', '桂皮']
-        },
-        {
-          recipeId: 2,
-          recipeName: '西红柿炒鸡蛋',
-          description: '简单易做的家常菜，酸甜可口',
-          imageUrl: 'https://via.placeholder.com/300x200?text=西红柿炒鸡蛋',
-          isMeat: 1,
-          isSoup: 0,
-          matchedIngredients: ['西红柿', '鸡蛋'],
-          missingIngredients: ['盐', '糖', '葱花']
-        },
-        {
-          recipeId: 4,
-          recipeName: '麻婆豆腐',
-          description: '川菜经典，麻辣鲜香',
-          imageUrl: 'https://via.placeholder.com/300x200?text=麻婆豆腐',
-          isMeat: 1,
-          isSoup: 0,
-          matchedIngredients: ['豆腐'],
-          missingIngredients: ['牛肉末', '豆瓣酱', '花椒', '辣椒']
-        },
-      ];
+    try {
+      const ingredientIds = selectedIngredients.map(item => item.ingredientsId);
+      const isMeat = onlyMeat ? true : onlyVegetarian ? false : undefined;
+      const response = await matchRecipes(ingredientIds, isMeat);
+      const matchedRecipes: MatchedRecipe[] = response.data.map((recipe: Recipe) => ({
+        ...recipe,
+        matchedIngredients: recipe.matchedIngredients,
+        missingIngredients:recipe.missingIngredients
+      }));
 
-      // 根据筛选条件过滤结果
-      let filteredRecipes = mockMatchedRecipes;
-      if (onlyMeat) {
-        filteredRecipes = filteredRecipes.filter(recipe => recipe.isMeat === 1);
-      }
-      if (onlyVegetarian) {
-        filteredRecipes = filteredRecipes.filter(recipe => recipe.isMeat === 0);
-      }
-
-      setMatchedRecipes(filteredRecipes);
+      setMatchedRecipes(matchedRecipes);
+    } catch (error) {
+      console.error('搜索菜谱失败:', error);
+      setMatchedRecipes([]);
+    } finally {
       setSearchLoading(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -150,9 +113,9 @@ const IngredientSearch: React.FC = () => {
                 >
                   <div>
                     {item.ingredientsName}
-                    {item.isMeat === 1 && <Tag color="red" style={{ marginLeft: 8 }}>荤</Tag>}
-                    {item.isMeat === 0 && item.isMain === 1 && <Tag color="green" style={{ marginLeft: 8 }}>素</Tag>}
-                    {item.isFlavour === 1 && <Tag color="blue" style={{ marginLeft: 8 }}>调料</Tag>}
+                    {!item.isFlavour && item.isMeat  && <Tag color="red" style={{ marginLeft: 8 }}>荤</Tag>}
+                    {!item.isFlavour && !item.isMeat  && <Tag color="green" style={{ marginLeft: 8 }}>素</Tag>}
+                    {item.isFlavour && <Tag color="blue" style={{ marginLeft: 8 }}>调料</Tag>}
                   </div>
                 </Option>
               ))}
@@ -169,22 +132,22 @@ const IngredientSearch: React.FC = () => {
             >
               查找菜谱
             </Button>
-            {/* <span style={{ marginRight: 8 }}>
-              <Switch 
-                checkedChildren="只看荤菜" 
-                unCheckedChildren="荤菜" 
-                checked={onlyMeat} 
-                onChange={handleMeatFilterChange} 
-              />
-            </span>
-            <span>
-              <Switch 
-                checkedChildren="只看素菜" 
-                unCheckedChildren="素菜" 
-                checked={onlyVegetarian} 
-                onChange={handleVegetarianFilterChange} 
-              />
-            </span> */}
+            {/*<span style={{ marginRight: 8 }}>*/}
+            {/*  <Switch*/}
+            {/*    checkedChildren="只看荤菜" */}
+            {/*    unCheckedChildren="荤菜" */}
+            {/*    checked={onlyMeat} */}
+            {/*    onChange={handleMeatFilterChange} */}
+            {/*  />*/}
+            {/*</span>*/}
+            {/*<span>*/}
+            {/*  <Switch */}
+            {/*    checkedChildren="只看素菜" */}
+            {/*    unCheckedChildren="素菜" */}
+            {/*    checked={onlyVegetarian} */}
+            {/*    onChange={handleVegetarianFilterChange} */}
+            {/*  />*/}
+            {/*</span>*/}
           </Col>
         </Row>
       </div>
@@ -216,7 +179,7 @@ const IngredientSearch: React.FC = () => {
                   <Link to={`/recipe/${recipe.recipeId}`}>
                     <Card
                       hoverable
-                      cover={recipe.imageUrl ? '' : <img alt={recipe.recipeName} src={recipe.imageUrl} />}
+                      cover={recipe.imageUrl ? <img alt={recipe.recipeName} src={recipe.imageUrl} /> : null}
                     >
                       <Meta 
                         title={recipe.recipeName} 

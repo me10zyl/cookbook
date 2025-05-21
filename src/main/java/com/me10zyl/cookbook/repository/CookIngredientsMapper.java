@@ -8,5 +8,5 @@ import java.util.List;
 
 
 public interface CookIngredientsMapper extends BaseMapper<CookIngredients> {
-    List<CookIngredients> findByRecipeId(@Param("recipeId") Long recipeId);
+    List<CookIngredients> findByRecipeId(@Param("recipeId") Integer recipeId);
 }

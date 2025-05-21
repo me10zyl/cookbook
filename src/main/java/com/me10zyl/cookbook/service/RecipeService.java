@@ -7,7 +7,7 @@ import com.me10zyl.cookbook.entity.Recipes;
 import java.util.List;
 
 public interface RecipeService extends IService<Recipes> {
-    Recipes getRecipeById(Long recipeId);
+    Recipes getRecipeById(Integer recipeId);
 
     
     List<CookIngredients> getIngredientsForRecipes(List<Integer> recipeIds);
