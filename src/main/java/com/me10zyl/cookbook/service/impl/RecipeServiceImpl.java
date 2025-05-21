@@ -38,8 +38,81 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
     }
 
     @Override
-    public List<CookIngredients> getIngredientsForRecipe(Long recipeId) {
-        return List.of();
+    public List<CookIngredients> getIngredientsForRecipes(List<Integer> recipeIds) {
+        if (recipeIds == null || recipeIds.isEmpty()) {
+            return List.of();
+        }
+        // 用于存储食材名称和对应的总用量
+        Map<String, CookIngredients> ingredientMap = new HashMap<>();
+        for (Integer recipeId : recipeIds) {
+            // 获取每个菜谱的食材列表
+            List<CookIngredients> ingredients = integredientsService.findByRecipeId(recipeId.longValue());
+            if (ingredients != null) {
+                for (CookIngredients ingredient : ingredients) {
+                    String ingredientName = ingredient.getIngredientsName();
+                    // 从 Map 中获取该食材
+                    CookIngredients existingIngredient = ingredientMap.get(ingredientName);
+                    if (existingIngredient == null) {
+                        // 如果 Map 中不存在该食材，创建一个新的并放入 Map
+                        CookIngredients newIngredient = new CookIngredients();
+                        newIngredient.setIngredientsName(ingredientName);
+                        newIngredient.setQuantity(ingredient.getQuantity());
+                        ingredientMap.put(ingredientName, newIngredient);
+                    } else {
+                        // 如果 Map 中已存在该食材，累加用量
+                        String existingQuantity = existingIngredient.getQuantity();
+                        String newQuantity = ingredient.getQuantity();
+                        // 解析用量数值和单位
+                        double existingAmount = parseQuantity(existingQuantity);
+                        //无法解析的情况
+                        if(existingAmount == 0){
+                            existingIngredient.setQuantity(newQuantity);
+                            continue;
+                        }
+                        double newAmount = parseQuantity(newQuantity);
+                        if(newAmount == 0){
+                            existingIngredient.setQuantity(newQuantity);
+                            continue;
+                        }
+                        String unit = getUnit(existingQuantity);
+                        // 累加用量数值
+                        double totalAmount = existingAmount + newAmount;
+                        // 拼接新的用量字符串
+                        existingIngredient.setQuantity(totalAmount + unit);
+                    }
+                }
+            }
+        }
+        // 将 Map 中的值转换为 List 返回
+        return new ArrayList<>(ingredientMap.values());
+    }
+
+    /**
+     * 解析用量字符串，提取数值部分
+     * @param quantity 用量字符串，如 "1g"
+     * @return 数值部分
+     */
+    private double parseQuantity(String quantity) {
+        try {
+            // 提取数字部分
+            String numberPart = quantity.replaceAll("[^0-9.]", "");
+            if (StrUtil.isBlank(numberPart)) {
+                return 0;
+            }
+            return Double.parseDouble(numberPart);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    /**
+     * 提取用量字符串的单位部分
+     * @param quantity 用量字符串，如 "1g"
+     * @return 单位部分
+     */
+    private String getUnit(String quantity) {
+        // 提取非数字部分作为单位
+        return quantity.replaceAll("[0-9.]", "");
     }
 
     @Override
@@ -117,6 +190,12 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
     public List<Recipes> matchRecipes(List<Long> ingredientIds, Boolean isMeat) {
         // 这里需要实现具体的食材匹配逻辑
         return new ArrayList<>();
+    }
+
+    @Override
+    public List<Recipes> getHotRecipes() {
+        List<Recipes> allRecipes = getAllRecipes(null);
+        return allRecipes.subList(0, Math.max(8, allRecipes.size()));
     }
 
     @Override

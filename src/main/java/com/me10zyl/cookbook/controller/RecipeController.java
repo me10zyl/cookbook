@@ -34,9 +34,9 @@ public class RecipeController {
     }
 
     // 菜谱反查食材页面
-    @GetMapping("/{recipeId}/ingredients")
-    public ResponseEntity<List<CookIngredients>> getIngredientsByRecipe(@PathVariable Long recipeId) {
-        List<CookIngredients> ingredients = recipeService.getIngredientsForRecipe(recipeId);
+    @GetMapping("/allIngredients")
+    public ResponseEntity<List<CookIngredients>> getIngredientsByRecipes(@RequestBody List<Integer> recipeIds) {
+        List<CookIngredients> ingredients = recipeService.getIngredientsForRecipes(recipeIds);
         return new ResponseEntity<>(ingredients, HttpStatus.OK);
     }
 
@@ -53,5 +53,11 @@ public class RecipeController {
     public ResponseEntity<List<Recipes>> getAllRecipes(@RequestParam(required = false) String name) {
         List<Recipes> recipes = recipeService.getAllRecipes(name);
         return new ResponseEntity<>(recipes, HttpStatus.OK);
+    }
+
+    //获取热门菜谱
+    @GetMapping("/getHotRecipes")
+    public List<Recipes> getHotRecipes() {
+        return recipeService.getHotRecipes();
     }
 }

@@ -10,7 +10,7 @@ public interface RecipeService extends IService<Recipes> {
     Recipes getRecipeById(Long recipeId);
 
     
-    List<CookIngredients> getIngredientsForRecipe(Long recipeId);
+    List<CookIngredients> getIngredientsForRecipes(List<Integer> recipeIds);
     
     List<Recipes> getDailyRecommendations(String preference);
 
@@ -32,4 +32,5 @@ public interface RecipeService extends IService<Recipes> {
 
     List<Recipes> matchRecipes(List<Long> ingredientIds, Boolean isMeat);
 
+    List<Recipes> getHotRecipes();
 }
