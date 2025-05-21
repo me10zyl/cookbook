@@ -196,7 +196,7 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
     @Override
     public List<Recipes> getHotRecipes() {
         List<Recipes> allRecipes = getAllRecipes(null);
-        return allRecipes.subList(0, Math.max(8, allRecipes.size()));
+        return allRecipes.subList(0, Math.min(8, allRecipes.size()));
     }
 
     @Override

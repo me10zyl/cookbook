@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import {Typography, Input, Button, Card, List, Divider, Tag, Empty, Spin, Select} from 'antd';
 import { SearchOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { Recipe, Ingredient, GroupedIngredients } from '../types';
-import { getAllRecipes, getIngredientsByRecipes } from '../api.ts';
+import {getAllRecipes, getHotRecipes, getIngredientsByRecipes} from '../api.ts';
 import {interceptors} from "axios";
+import {showError} from "../util/messageService.ts";
 
 const { Title, Paragraph } = Typography;
 const { Search } = Input;
@@ -27,7 +28,7 @@ const RecipeIngredients: React.FC = () => {
     const fetchRecipes = async () => {
       setLoading(true);
       try {
-        const response = await getAllRecipes();
+        const response = await getHotRecipes();
         setRecipes(response.data.map((recipe: any) => ({
           recipeId: recipe.recipeId,
           recipeName: recipe.recipeName
@@ -49,7 +50,7 @@ const RecipeIngredients: React.FC = () => {
 
   // 处理搜索菜谱
   const handleSearch = async (): void => {
-    if (!searchValue.trim()) return;
+
 
     setSearchLoading(true);
     try {
@@ -58,15 +59,21 @@ const RecipeIngredients: React.FC = () => {
         recipeId: recipe.recipeId,
         recipeName: recipe.recipeName
       }));
-      if (filteredRecipes.length > 0) {
-        setSelectedRecipeIds([filteredRecipes[0].recipeId]);
-        await fetchIngredients([filteredRecipes[0].recipeId]);
-      } else {
-        setSelectedRecipeIds([]);
-        setIngredients([]);
+      const selected = recipes.find((recipe) => selectedRecipeIds.includes(recipe.recipeId))
+      let all = [...filteredRecipes];
+      if(selected){
+        all.splice(0, 0, selected)
       }
+      //去重
+      all = all.filter((recipe, index, self) => {
+           return  index === self.findIndex((r) => r.recipeId === recipe.recipeId)
+          }
+      );
+      console.log('111',all)
+      setRecipes(all);
     } catch (error) {
       console.error('搜索菜谱失败:', error);
+      showError(error);
     } finally {
       setSearchLoading(false);
     }
@@ -108,8 +115,7 @@ const RecipeIngredients: React.FC = () => {
 
   // 生成购物清单
   const generateShoppingList = (): void => {
-    const requiredIngredients = ingredients.filter(item => item.isRequired === 1);
-    const shoppingList = requiredIngredients.map(item => `${item.ingredientsName} ${item.quantity}`).join('\n');
+    const shoppingList = ingredients.map(item => `${item.ingredientsName} ${item.quantity}`).join('\n');
 
     navigator.clipboard.writeText(shoppingList)
       .then(() => {
@@ -144,24 +150,37 @@ console.log(ingredients, groupedIngredients)
       </div>
 
       <div className="recipe-list" style={{ marginBottom: 30 }}>
-        <Divider orientation="left">热门菜谱</Divider>
+        <Divider orientation="left">菜谱选择</Divider>
         {loading ? (
           <Spin />
         ) : (
-          <Select
-            mode="multiple"
-            style={{ width: '100%' }}
-            placeholder="选择菜谱"
-            value={selectedRecipeIds}
-            onChange={handleRecipeSelect}
-          >
-            {recipes.map(recipe => (
-              <Option key={recipe.recipeId} value={recipe.recipeId}>
-                {recipe.recipeName}
-              </Option>
-            ))}
-          </Select>
+            // <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            //   {recipes.map(recipe => (
+            //       <Tag
+            //           key={recipe.recipeId}
+            //           // color={selectedRecipe && selectedRecipe.recipeId === recipe.recipeId ? 'blue' : 'default'}
+            //           style={{ fontSize: 14, padding: '4px 8px', cursor: 'pointer', marginBottom: 8 }}
+            //           onClick={() => handleRecipeSelect(recipe.recipeId)}
+            //       >
+            //         {recipe.recipeName}
+            //       </Tag>
+            //   ))}
+            // </div>
+            <Select
+                mode="multiple"
+                style={{ width: '100%' }}
+                placeholder="选择菜谱"
+                value={selectedRecipeIds}
+                onChange={handleRecipeSelect}
+            >
+              {recipes.map(recipe => (
+                  <Option key={recipe.recipeId} value={recipe.recipeId}>
+                    {recipe.recipeName}
+                  </Option>
+              ))}
+            </Select>
         )}
+
       </div>
 
       {selectedRecipeIds.length > 0 ? (

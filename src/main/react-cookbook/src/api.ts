@@ -85,6 +85,11 @@ export const getAllRecipes = async (name?: string) => {
   return api.get('/recipes/list', { params });
 };
 
+//热门菜谱
+export const getHotRecipes = async () => {
+  return api.get('/recipes/getHotRecipes');
+}
+
 // 菜谱展示页面
 export const getRecipeDetails = async (recipeId: number) => {
   return api.get(`/recipes/${recipeId}`);
