@@ -53,11 +53,7 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
                     // 从 Map 中获取该食材
                     CookIngredients existingIngredient = ingredientMap.get(ingredientName);
                     if (existingIngredient == null) {
-                        // 如果 Map 中不存在该食材，创建一个新的并放入 Map
-                        CookIngredients newIngredient = new CookIngredients();
-                        newIngredient.setIngredientsName(ingredientName);
-                        newIngredient.setQuantity(ingredient.getQuantity());
-                        ingredientMap.put(ingredientName, newIngredient);
+                        ingredientMap.put(ingredientName, ingredient);
                     } else {
                         // 如果 Map 中已存在该食材，累加用量
                         String existingQuantity = existingIngredient.getQuantity();
@@ -78,7 +74,12 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
                         // 累加用量数值
                         double totalAmount = existingAmount + newAmount;
                         // 拼接新的用量字符串
-                        existingIngredient.setQuantity(totalAmount + unit);
+                        //.0去掉
+                        if(totalAmount == (int)totalAmount){
+                            existingIngredient.setQuantity((int)totalAmount + unit);
+                        }else {
+                            existingIngredient.setQuantity(totalAmount + unit);
+                        }
                     }
                 }
             }
