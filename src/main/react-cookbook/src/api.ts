@@ -95,10 +95,13 @@ export const matchRecipesByIngredients = async (ingredientIds: number[], isMeat?
   return api.post('/recipes/match', ingredientIds, { params: { isMeat } });
 };
 
-// 菜谱反查食材页面
-export const getIngredientsByRecipe = async (recipeId: number) => {
-  return api.get(`/recipes/${recipeId}/ingredients`);
+
+// 多选菜谱反查食材
+export const getIngredientsByRecipes = async (recipeIds: number[]) => {
+  return api.post('/recipes/allIngredients', recipeIds);
 };
+
+
 
 // 每日随机菜谱推荐页面
 export const getDailyRecommendations = async (preference?: string) => {

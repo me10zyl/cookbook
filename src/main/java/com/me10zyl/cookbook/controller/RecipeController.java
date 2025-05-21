@@ -34,7 +34,7 @@ public class RecipeController {
     }
 
     // 菜谱反查食材页面
-    @GetMapping("/allIngredients")
+    @PostMapping("/allIngredients")
     public ResponseEntity<List<CookIngredients>> getIngredientsByRecipes(@RequestBody List<Integer> recipeIds) {
         List<CookIngredients> ingredients = recipeService.getIngredientsForRecipes(recipeIds);
         return new ResponseEntity<>(ingredients, HttpStatus.OK);

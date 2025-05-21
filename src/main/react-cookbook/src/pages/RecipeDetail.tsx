@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Typography, Divider, Tag, List, Steps, Button, Row, Col, Card, Spin, Empty } from 'antd';
 import { PlayCircleOutlined, ClockCircleOutlined, FireOutlined } from '@ant-design/icons';
 import { Recipe, Ingredient, GroupedIngredients } from '../types';
-import { getRecipeDetails, getIngredientsByRecipe } from '../api.ts';
+import { getRecipeDetails } from '../api.ts';
 
 const { Title, Paragraph } = Typography;
 
