@@ -9,6 +9,7 @@ export interface Ingredient {
   isFlavour: number;
   quantity?: string;
   isRequired?: number;
+  defaultQuantity: string;
 }
 
 // 菜谱接口定义

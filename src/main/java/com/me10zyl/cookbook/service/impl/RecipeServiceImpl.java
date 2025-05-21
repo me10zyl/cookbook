@@ -88,6 +88,9 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
 
     @Override
     public CookIngredients createIngredient(CookIngredients ingredient) {
+        if(integredientsService.hasName(ingredient.getIngredientsName())){
+            throw new ServiceException("已有该食材：" + ingredient.getIngredientsName());
+        }
         integredientsService.save(ingredient);
         return ingredient;
     }

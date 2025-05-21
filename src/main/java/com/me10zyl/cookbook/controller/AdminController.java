@@ -28,7 +28,7 @@ public class AdminController {
     @DeleteMapping("/ingredients/delete/{ingredientId}")
     public ResponseEntity<Void> deleteIngredient(@PathVariable Integer ingredientId) {
         recipeService.deleteIngredient(ingredientId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 
@@ -43,7 +43,7 @@ public class AdminController {
     @GetMapping("/recipe/delete/{recipeId}")
     public ResponseEntity<Void> deleteRecipe(@PathVariable Integer recipeId) {
         recipeService.deleteRecipe(recipeId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // 获取所有原料

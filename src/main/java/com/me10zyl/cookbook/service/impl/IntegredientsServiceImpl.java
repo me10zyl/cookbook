@@ -14,4 +14,9 @@ public class IntegredientsServiceImpl extends ServiceImpl<CookIngredientsMapper,
     public List<CookIngredients> findByRecipeId(Long recipeId) {
         return baseMapper.findByRecipeId(recipeId);
     }
+
+    @Override
+    public boolean hasName(String ingredientsName) {
+        return lambdaQuery().eq(CookIngredients::getIngredientsName, ingredientsName).exists();
+    }
 }

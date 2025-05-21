@@ -12,6 +12,7 @@ import {
   updateIngredient,
   getAllRecipes, getRecipeById
 } from '../api.ts';
+import {showSuccess, showError} from "../util/messageService.ts";
 
 const { TabPane } = Tabs;
 const { Title, Paragraph } = Typography;
@@ -47,7 +48,7 @@ const RecipeManagement: React.FC = () => {
         setIngredients(ingredientResponse.data);
       } catch (error) {
         console.error('数据获取失败:', error);
-        message.error('数据获取失败，请稍后重试');
+        showError('数据获取失败，请稍后重试');
       } finally {
         setRecipeLoading(false);
         setIngredientLoading(false);
@@ -86,10 +87,10 @@ const RecipeManagement: React.FC = () => {
     try {
       await deleteRecipe(recipeId);
       setRecipes(recipes.filter(recipe => recipe.recipeId !== recipeId));
-      message.success('删除成功');
+      showSuccess('删除成功');
     } catch (error) {
       console.error('删除失败:', error);
-      message.error('删除失败，请稍后重试');
+      showError('删除失败，请稍后重试');
     }
   };
 
@@ -113,7 +114,7 @@ const RecipeManagement: React.FC = () => {
           // 新增
           const response = await createRecipe(recipeData);
           setRecipes([...recipes, response.data]);
-          message.success('添加成功');
+          showSuccess('添加成功');
         } else {
           // 编辑
           const response = await updateRecipe(editingRecipeId, recipeData);
@@ -124,13 +125,13 @@ const RecipeManagement: React.FC = () => {
             return recipe;
           });
           setRecipes(updatedRecipes);
-          message.success('更新成功');
+          showSuccess('更新成功');
         }
         setRecipeModalVisible(false);
       });
     } catch (error) {
       console.error('提交失败:', error);
-      message.error('提交失败，请稍后重试');
+      showError('提交失败，请稍后重试');
     }
   };
 
@@ -148,7 +149,8 @@ const RecipeManagement: React.FC = () => {
       isMeat: record.isMeat,
       isMain: record.isMain,
       isFlavour: record.isFlavour,
-      quantity: record.quantity
+      quantity: record.quantity,
+      defaultQuantity: record.defaultQuantity,
     });
     setIngredientModalVisible(true);
   };
@@ -157,10 +159,11 @@ const RecipeManagement: React.FC = () => {
     try {
       await deleteIngredient(ingredientId);
       setIngredients(ingredients.filter(ingredient => ingredient.ingredientsId !== ingredientId));
-      message.success('删除成功');
+      console.log('删除成功', ingredients)
+      showSuccess('删除成功');
     } catch (error) {
       console.error('删除失败:', error);
-      message.error('删除失败，请稍后重试');
+      showError('删除失败，请稍后重试');
     }
   };
 
@@ -171,7 +174,7 @@ const RecipeManagement: React.FC = () => {
           // 新增
           const response = await createIngredient(values);
           setIngredients([...ingredients, response.data]);
-          message.success('添加成功');
+          showSuccess('添加成功');
         } else {
           // 编辑
           const response = await updateIngredient(editingIngredientId, values);
@@ -182,13 +185,13 @@ const RecipeManagement: React.FC = () => {
             return ingredient;
           });
           setIngredients(updatedIngredients);
-          message.success('更新成功');
+          showSuccess('更新成功');
         }
         setIngredientModalVisible(false);
       });
     } catch (error) {
       console.error('提交失败:', error);
-      message.error('提交失败，请稍后重试');
+      showError('提交失败，请稍后重试');
     }
   };
 
@@ -571,8 +574,8 @@ const RecipeManagement: React.FC = () => {
                   style={{ flex: 1 }}
                 >
                   <Select placeholder="请选择">
-                    <Option value={1}>是</Option>
-                    <Option value={0}>否</Option>
+                    <Option value={true}>是</Option>
+                    <Option value={false}>否</Option>
                   </Select>
                 </Form.Item>
 
@@ -583,8 +586,8 @@ const RecipeManagement: React.FC = () => {
                   style={{ flex: 1 }}
                 >
                   <Select placeholder="请选择">
-                    <Option value={1}>是</Option>
-                    <Option value={0}>否</Option>
+                    <Option value={true}>是</Option>
+                    <Option value={false}>否</Option>
                   </Select>
                 </Form.Item>
 
@@ -595,8 +598,8 @@ const RecipeManagement: React.FC = () => {
                   style={{ flex: 1 }}
                 >
                   <Select placeholder="请选择">
-                    <Option value={1}>是</Option>
-                    <Option value={0}>否</Option>
+                    <Option value={true}>是</Option>
+                    <Option value={false}>否</Option>
                   </Select>
                 </Form.Item>
               </div>

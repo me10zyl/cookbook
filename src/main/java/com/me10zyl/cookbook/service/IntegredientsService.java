@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface IntegredientsService extends IService<CookIngredients> {
     List<CookIngredients> findByRecipeId(Long recipeId);
+
+    boolean hasName(String ingredientsName);
 }
