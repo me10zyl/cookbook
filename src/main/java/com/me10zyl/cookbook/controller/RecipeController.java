@@ -24,20 +24,19 @@ public class RecipeController {
         return new ResponseEntity<>(recipe, HttpStatus.OK);
     }
 
-    // 食材匹配菜谱页面
-    @PostMapping("/match")
-    public ResponseEntity<List<Recipes>> matchRecipesByIngredients(
-            @RequestBody List<Long> ingredientIds, 
-            @RequestParam(required = false) Boolean isMeat) {
-        List<Recipes> recipes = recipeService.matchRecipes(ingredientIds, isMeat);
-        return new ResponseEntity<>(recipes, HttpStatus.OK);
-    }
 
     // 菜谱反查食材页面
     @PostMapping("/allIngredients")
     public ResponseEntity<List<CookIngredients>> getIngredientsByRecipes(@RequestBody List<Integer> recipeIds) {
         List<CookIngredients> ingredients = recipeService.getIngredientsForRecipes(recipeIds);
         return new ResponseEntity<>(ingredients, HttpStatus.OK);
+    }
+
+    //通过多个食材查找菜谱
+    @PostMapping("/matchRecipes")
+    public ResponseEntity<List<Recipes>> matchRecipes(@RequestBody List<Integer> ingredientsIds) {
+        List<Recipes> recipesByIngredients = recipeService.matchRecipes(ingredientsIds);
+        return new ResponseEntity<>(recipesByIngredients, HttpStatus.OK);
     }
 
     // 每日随机菜谱推荐页面

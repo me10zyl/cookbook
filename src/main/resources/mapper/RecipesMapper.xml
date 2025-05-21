@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.me10zyl.cookbook.repository.RecipesMapper">
+
+
+    <select id="findRecipesByIngredients" resultType="com.me10zyl.cookbook.entity.Recipes">
+        SELECT a.* FROM recipes a
+                 join recipe_ingredients b on a.recipe_id = b.recipe_id
+        WHERE b.ingredients_id IN
+        <foreach item="ingredient" collection="ingredientIds" separator="," open="(" close=")">
+            #{ingredient}
+        </foreach>
+        group by a.recipe_id
+    </select>
+</mapper>

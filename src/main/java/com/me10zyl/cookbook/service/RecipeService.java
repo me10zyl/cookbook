@@ -30,7 +30,7 @@ public interface RecipeService extends IService<Recipes> {
 
     List<CookIngredients> getAllIngredients();
 
-    List<Recipes> matchRecipes(List<Long> ingredientIds, Boolean isMeat);
-
     List<Recipes> getHotRecipes();
+
+    List<Recipes> matchRecipes(List<Integer> ingredientsIds);
 }

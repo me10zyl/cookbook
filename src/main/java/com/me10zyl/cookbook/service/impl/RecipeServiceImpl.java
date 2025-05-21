@@ -187,16 +187,16 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
         return integredientsService.list();
     }
 
-    @Override
-    public List<Recipes> matchRecipes(List<Long> ingredientIds, Boolean isMeat) {
-        // 这里需要实现具体的食材匹配逻辑
-        return new ArrayList<>();
-    }
 
     @Override
     public List<Recipes> getHotRecipes() {
         List<Recipes> allRecipes = getAllRecipes(null);
         return allRecipes.subList(0, Math.min(8, allRecipes.size()));
+    }
+
+    @Override
+    public List<Recipes> matchRecipes(List<Integer> ingredientIds) {
+        return baseMapper.findRecipesByIngredients(ingredientIds);
     }
 
     @Override
