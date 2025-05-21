@@ -103,14 +103,14 @@ const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe: propRecipe }) => {
           <Paragraph style={{ marginTop: 16 }}>
             {recipe.description}
           </Paragraph>
-          
-          <div className="recipe-image" style={{ marginTop: 20, marginBottom: 20 }}>
+
+          {recipe.imageUrl ? <div className="recipe-image" style={{ marginTop: 20, marginBottom: 20 }}>
             <img 
               src={recipe.imageUrl} 
               alt={recipe.recipeName} 
               style={{ width: '100%', maxHeight: '400px', objectFit: 'cover', borderRadius: '8px' }} 
             />
-          </div>
+          </div> :  <></>}
           
           <Divider orientation="left">烹饪步骤</Divider>
           
