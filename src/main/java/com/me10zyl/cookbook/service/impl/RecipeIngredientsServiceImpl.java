@@ -10,6 +10,7 @@ import com.me10zyl.cookbook.util.DiffUtil;
 import com.me10zyl.cookbook.util.ParamUtil;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 
 import static com.me10zyl.cookbook.util.StreamUtil.mapId;
@@ -20,6 +21,10 @@ public class RecipeIngredientsServiceImpl  extends ServiceImpl<RecipeIngredients
     public void saveUpdate(List<CookIngredients> ingredients, Integer recipeId) {
         for (CookIngredients ingredient : ingredients) {
             ParamUtil.checkBlank(ingredient, false, "quantity");
+        }
+        if(new HashSet<>(mapId(ingredients, CookIngredients::getIngredientsId)).size()
+                != ingredients.size()) {
+            throw new ServiceException("食材不能重复");
         }
         List<RecipeIngredients> recipeIngredients = listByRecipeId(recipeId);
         DiffUtil.diff(mapId(ingredients, e->{

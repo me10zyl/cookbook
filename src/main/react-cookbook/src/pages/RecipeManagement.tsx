@@ -131,7 +131,6 @@ const RecipeManagement: React.FC = () => {
       });
     } catch (error) {
       console.error('提交失败:', error);
-      showError('提交失败，请稍后重试');
     }
   };
 
@@ -192,6 +191,19 @@ const RecipeManagement: React.FC = () => {
     } catch (error) {
       console.error('提交失败:', error);
       showError('提交失败，请稍后重试');
+    }
+  };
+
+  const handleSelectIngredient = (value: number, field: any) => {
+    const selectedIngredient = ingredients.find(ingredient => ingredient.ingredientsId === value);
+    if (selectedIngredient) {
+      let vname = ['ingredients', field.name];
+      console.log(vname,recipeForm.getFieldValue(vname), selectedIngredient.defaultQuantity)
+      recipeForm.setFieldValue(
+        vname, {
+          ...recipeForm.getFieldValue(vname),
+          quantity: selectedIngredient.defaultQuantity
+        });
     }
   };
 
@@ -418,7 +430,7 @@ const RecipeManagement: React.FC = () => {
                             name={[field.name, 'ingredientsId']}
                             rules={[{ required: true, message: '请选择食材' }]}
                           >
-                            <Select style={{ width: 200 }} placeholder="选择食材">
+                            <Select style={{ width: 200 }} placeholder="选择食材"  onChange={(value) => handleSelectIngredient(value, field)}>
                               {ingredients.map(ingredient => (
                                 <Option key={ingredient.ingredientsId} value={ingredient.ingredientsId}>
                                   {ingredient.ingredientsName}
