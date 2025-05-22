@@ -8,7 +8,6 @@ import { Recipe, Ingredient } from '../types';
 
 const { Title, Paragraph } = Typography;
 const { Meta } = Card;
-const { CheckboxGroup } = Checkbox;
 
 interface DailyRecipe extends Recipe {
   type: string;
@@ -384,7 +383,7 @@ const DailyRecommendation: React.FC = () => {
             </Button>
           </Col>
           <Col xs={24} md={12}>
-            <CheckboxGroup
+            <Checkbox.Group
               options={preferenceOptions}
               value={preferences}
               onChange={handlePreferenceChange}
