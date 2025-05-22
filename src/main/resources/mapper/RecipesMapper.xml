@@ -12,4 +12,17 @@
         </foreach>
         group by a.recipe_id
     </select>
+    <select id="getBalanceRecipes" resultType="com.me10zyl.cookbook.entity.Recipes">
+            (SELECT * FROM recipes WHERE is_meat = 1 ORDER BY RAND() LIMIT 1)
+            UNION ALL
+            (SELECT * FROM recipes WHERE is_meat = 0 and is_soup = 0 ORDER BY RAND() LIMIT 1)
+            UNION ALL
+            (SELECT * FROM recipes WHERE is_soup = 1 ORDER BY RAND() LIMIT 1)
+    </select>
+    <select id="getVegetablesRecipes" resultType="com.me10zyl.cookbook.entity.Recipes">
+            SELECT * FROM recipes WHERE is_meat = 0 ORDER BY RAND() LIMIT 3
+    </select>
+    <select id="getQuickRecipes" resultType="com.me10zyl.cookbook.entity.Recipes">
+            SELECT * FROM recipes WHERE cook_time &lt; 60 ORDER BY RAND() LIMIT 3
+    </select>
 </mapper>

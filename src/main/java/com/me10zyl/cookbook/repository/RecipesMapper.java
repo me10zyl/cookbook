@@ -9,4 +9,10 @@ import java.util.List;
 
 public interface RecipesMapper extends BaseMapper<Recipes> {
     List<Recipes> findRecipesByIngredients(@Param("ingredientIds") List<Integer> ingredientIds);
+
+    List<Recipes> getBalanceRecipes();
+
+    List<Recipes> getVegetablesRecipes();
+
+    List<Recipes> getQuickRecipes();
 }

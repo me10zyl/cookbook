@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import com.me10zyl.cookbook.dto.DayRecommendation;
 import com.me10zyl.cookbook.entity.CookIngredients;
 import com.me10zyl.cookbook.entity.Recipes;
 import com.me10zyl.cookbook.exception.ServiceException;
@@ -20,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.me10zyl.cookbook.util.StreamUtil.mapId;
 
 @Service
 @RequiredArgsConstructor
@@ -209,47 +212,40 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
     }
 
     @Override
-    public List<Recipes> getDailyRecommendations(String preference) {
-        List<Recipes> allRecipes = list();
-        List<Recipes> filteredRecipes = allRecipes;
-        
-        if (preference != null) {
-            switch (preference.toLowerCase()) {
-                case "低脂":
-                    // 假设低脂过滤逻辑
-                    filteredRecipes = allRecipes.stream()
-                            .filter(recipe -> /* 低脂过滤条件 */ true)
-                            .collect(Collectors.toList());
-                    break;
-                case "素食":
-                    filteredRecipes = allRecipes.stream()
-                            .filter(recipe -> !recipe.getIsMeat())
-                            .collect(Collectors.toList());
-                    break;
-                case "快速烹饪":
-                    filteredRecipes = allRecipes.stream()
-                            .filter(recipe -> recipe.getCookTime() != null && recipe.getCookTime() <= 30)
-                            .collect(Collectors.toList());
-                    break;
-            }
-        }
-        
-        // 随机选择多道菜谱，保证类型均衡
-        Map<String, List<Recipes>> categorizedRecipes = new HashMap<>();
-        categorizedRecipes.put("荤菜", filteredRecipes.stream().filter(Recipes::getIsMeat).collect(Collectors.toList()));
-        categorizedRecipes.put("素菜", filteredRecipes.stream().filter(recipe -> !recipe.getIsMeat()).collect(Collectors.toList()));
-        categorizedRecipes.put("汤品", filteredRecipes.stream().filter(Recipes::getIsSoup).collect(Collectors.toList()));
+    public DayRecommendation getDailyRecommendations(String preference) {
+        List<Recipes> filteredRecipes = null;
 
-        List<Recipes> recommendations = new ArrayList<>();
-        Random random = new Random();
-        
-        for (List<Recipes> category : categorizedRecipes.values()) {
-            if (!category.isEmpty()) {
-                int index = random.nextInt(category.size());
-                recommendations.add(category.get(index));
-            }
+        if(StrUtil.isBlank(preference)){
+            preference = "均衡";
         }
-        
-        return recommendations;
+        switch (preference.toLowerCase()) {
+            case "均衡":
+                filteredRecipes = getBalancedRecipes();
+                break;
+            case "素食":
+                filteredRecipes = getVegetablesRecipes();
+                break;
+            case "快速烹饪":
+                filteredRecipes = getQuickRecipes();
+                break;
+            default:
+                throw new ServiceException("未知偏好");
+        }
+        DayRecommendation dayRecommendation = new DayRecommendation();
+        dayRecommendation.setAllIngredients(getIngredientsForRecipes(mapId(filteredRecipes, Recipes::getRecipeId)));
+        dayRecommendation.setRecipes(filteredRecipes);
+        return dayRecommendation;
+    }
+
+    private List<Recipes> getQuickRecipes() {
+        return baseMapper.getQuickRecipes();
+    }
+
+    private List<Recipes> getVegetablesRecipes() {
+        return baseMapper.getVegetablesRecipes();
+    }
+
+    private List<Recipes> getBalancedRecipes() {
+        return baseMapper.getBalanceRecipes();
     }
 }

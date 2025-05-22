@@ -1,6 +1,7 @@
 package com.me10zyl.cookbook.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.me10zyl.cookbook.dto.DayRecommendation;
 import com.me10zyl.cookbook.entity.CookIngredients;
 import com.me10zyl.cookbook.entity.Recipes;
 
@@ -12,7 +13,7 @@ public interface RecipeService extends IService<Recipes> {
     
     List<CookIngredients> getIngredientsForRecipes(List<Integer> recipeIds);
     
-    List<Recipes> getDailyRecommendations(String preference);
+    DayRecommendation getDailyRecommendations(String preference);
 
     Recipes createRecipe(Recipes recipe);
 

@@ -1,6 +1,7 @@
 package com.me10zyl.cookbook.controller;
 
 
+import com.me10zyl.cookbook.dto.DayRecommendation;
 import com.me10zyl.cookbook.entity.CookIngredients;
 import com.me10zyl.cookbook.entity.Recipes;
 import com.me10zyl.cookbook.service.RecipeService;
@@ -41,10 +42,10 @@ public class RecipeController {
 
     // 每日随机菜谱推荐页面
     @GetMapping("/daily-recommendations")
-    public ResponseEntity<List<Recipes>> getDailyRecommendations(
+    public ResponseEntity<DayRecommendation> getDailyRecommendations(
             @RequestParam(required = false) String preference) {
-        List<Recipes> recommendations = recipeService.getDailyRecommendations(preference);
-        return new ResponseEntity<>(recommendations, HttpStatus.OK);
+        DayRecommendation dailyRecommendations = recipeService.getDailyRecommendations(preference);
+        return new ResponseEntity<>(dailyRecommendations, HttpStatus.OK);
     }
 
     // 获取所有菜谱
