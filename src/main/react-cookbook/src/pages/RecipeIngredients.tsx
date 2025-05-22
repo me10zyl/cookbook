@@ -124,11 +124,22 @@ const RecipeIngredients: React.FC = () => {
   const groupedIngredients = groupIngredients(ingredients);
 
   const tagColors = ['blue', 'green', 'red', 'orange', 'purple', 'cyan', 'magenta', 'lime'];
-
+// 简单的哈希函数，将字符串转换为数字
+  const hashString = (str: string) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash &= hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash);
+  };
   // 生成随机颜色的函数
-  const getRandomColor = () => {
-    const randomIndex = Math.floor(Math.random() * tagColors.length);
-    return tagColors[randomIndex];
+  const getColorByName = (name: string) => {
+    console.log('name')
+    const hashValue = hashString(name);
+    const index = hashValue % tagColors.length;
+    return tagColors[index];
   };
 
   return (
@@ -182,6 +193,18 @@ const RecipeIngredients: React.FC = () => {
                   </Option>
               ))}
             </Select>
+              <Divider orientation={"left"}>已选菜谱</Divider>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {recipes.filter(e=>selectedRecipeIds.includes(e.recipeId)).map(recipe => (
+                    <Tag
+                        key={recipe.recipeId}
+                        color={'blue'}
+                        style={{ fontSize: 14, padding: '4px 8px', cursor: 'pointer', marginBottom: 8 }}
+                    >
+                      {recipe.recipeName}
+                    </Tag>
+                ))}
+              </div>
             </div>
         )}
 
@@ -203,17 +226,6 @@ const RecipeIngredients: React.FC = () => {
             }
             loading={loading}
           >
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {recipes.filter(e=>selectedRecipeIds.includes(e.recipeId)).map(recipe => (
-                  <Tag
-                      key={recipe.recipeId}
-                      color={getRandomColor()}
-                      style={{ fontSize: 14, padding: '4px 8px', cursor: 'pointer', marginBottom: 8 }}
-                  >
-                    {recipe.recipeName}
-                  </Tag>
-              ))}
-            </div>
             {groupedIngredients.main.length > 0 && (
               <>
                 <Divider orientation="left" plain>主料</Divider>
