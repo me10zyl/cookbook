@@ -1,11 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import {BrowserRouter as Router, Link, Route, Routes} from 'react-router-dom';
 import {Layout, Menu, message, Typography} from 'antd';
-import { HomeOutlined, SearchOutlined, BookOutlined, CalendarOutlined, SettingOutlined } from '@ant-design/icons';
+import {BookOutlined, CalendarOutlined, HomeOutlined, SearchOutlined, SettingOutlined} from '@ant-design/icons';
 import './App.css';
 
 // 导入页面组件
-import RecipeDetail from './pages/RecipeDetail.tsx';
 import IngredientSearch from './pages/IngredientSearch.tsx';
 import RecipeIngredients from './pages/RecipeIngredients.tsx';
 import DailyRecommendation from './pages/DailyRecommendation.tsx';
@@ -21,8 +20,7 @@ function App() {
       message.useMessage();
 
   const getSelectedKey = () => {
-    const pathname = window.location.pathname;
-    return pathname;
+    return window.location.pathname;
   };
 
   // 在组件加载时设置 message api

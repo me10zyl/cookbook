@@ -122,7 +122,15 @@ const RecipeIngredients: React.FC = () => {
   };
 
   const groupedIngredients = groupIngredients(ingredients);
-console.log(ingredients, groupedIngredients)
+
+  const tagColors = ['blue', 'green', 'red', 'orange', 'purple', 'cyan', 'magenta', 'lime'];
+
+  // 生成随机颜色的函数
+  const getRandomColor = () => {
+    const randomIndex = Math.floor(Math.random() * tagColors.length);
+    return tagColors[randomIndex];
+  };
+
   return (
     <div className="recipe-ingredients-container">
       <Title level={2}>菜谱反查食材</Title>
@@ -160,6 +168,7 @@ console.log(ingredients, groupedIngredients)
             //       </Tag>
             //   ))}
             // </div>
+            <div>
             <Select
                 mode="multiple"
                 style={{ width: '100%' }}
@@ -173,6 +182,7 @@ console.log(ingredients, groupedIngredients)
                   </Option>
               ))}
             </Select>
+            </div>
         )}
 
       </div>
@@ -193,6 +203,17 @@ console.log(ingredients, groupedIngredients)
             }
             loading={loading}
           >
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {recipes.filter(e=>selectedRecipeIds.includes(e.recipeId)).map(recipe => (
+                  <Tag
+                      key={recipe.recipeId}
+                      color={getRandomColor()}
+                      style={{ fontSize: 14, padding: '4px 8px', cursor: 'pointer', marginBottom: 8 }}
+                  >
+                    {recipe.recipeName}
+                  </Tag>
+              ))}
+            </div>
             {groupedIngredients.main.length > 0 && (
               <>
                 <Divider orientation="left" plain>主料</Divider>
