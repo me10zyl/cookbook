@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Row, Col, Card, Typography, Spin, Empty, Menu, Layout, Divider, Button } from 'antd';
 import { RightOutlined, BookOutlined, FireOutlined, CoffeeOutlined, BulbOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import RecipeDetail from './RecipeDetail.tsx';
@@ -14,6 +14,8 @@ const Home: React.FC = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // 从API获取菜谱数据
   useEffect(() => {
@@ -34,11 +36,25 @@ const Home: React.FC = () => {
     fetchRecipes();
   }, []);
 
+  // 根据URL参数选择菜谱
+  useEffect(() => {
+    const pathParts = location.pathname.split('/');
+    const recipeId = parseInt(pathParts[pathParts.length - 1]);
+    if (!isNaN(recipeId)) {
+      const recipe = recipes.find(r => r.recipeId === recipeId);
+      if (recipe) {
+        setSelectedRecipe(recipe);
+      }
+    }
+  }, [location.pathname, recipes]);
+
   // 处理菜谱选择
   const handleRecipeSelect = (recipeId: number): void => {
     const recipe = recipes.find(r => r.recipeId === recipeId);
     if (recipe) {
       setSelectedRecipe(recipe);
+      // 导航到对应的菜谱页面
+      navigate(`/recipe/${recipeId}`);
     }
   };
 

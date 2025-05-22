@@ -59,7 +59,7 @@ function App() {
           <div className="site-layout-content">
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/recipe/:id" element={<RecipeDetail />} />
+              <Route path="/recipe/:id" element={<Home />} />
               <Route path="/ingredient-search" element={<IngredientSearch />} />
               <Route path="/recipe-ingredients" element={<RecipeIngredients />} />
               <Route path="/daily-recommendation" element={<DailyRecommendation />} />
