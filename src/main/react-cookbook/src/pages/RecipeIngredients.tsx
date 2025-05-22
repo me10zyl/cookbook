@@ -5,6 +5,7 @@ import { Recipe, Ingredient, GroupedIngredients } from '../types';
 import {getAllRecipes, getHotRecipes, getIngredientsByRecipes} from '../api.ts';
 import {interceptors} from "axios";
 import {showError} from "../util/messageService.ts";
+import copyText from "../util/clipboard.ts";
 
 const { Title, Paragraph } = Typography;
 const { Search } = Input;
@@ -117,14 +118,7 @@ const RecipeIngredients: React.FC = () => {
   const generateShoppingList = (): void => {
     const shoppingList = ingredients.map(item => `${item.ingredientsName} ${item.quantity}`).join('\n');
 
-    navigator.clipboard.writeText(shoppingList)
-      .then(() => {
-        alert('购物清单已复制到剪贴板！');
-      })
-      .catch(err => {
-        console.error('复制失败:', err);
-        alert('复制失败，请手动记录购物清单。');
-      });
+    copyText(shoppingList)
   };
 
   const groupedIngredients = groupIngredients(ingredients);

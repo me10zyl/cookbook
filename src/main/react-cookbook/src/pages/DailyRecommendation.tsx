@@ -6,6 +6,7 @@ import locale from 'antd/es/date-picker/locale/zh_CN';
 import dayjs from 'dayjs';
 import { DailyRecipe, DayRecommendation, Ingredient } from '../types';
 import { getDailyRecommendations } from '../api.ts';
+import copyText from "../util/clipboard.ts";
 
 const { Title, Paragraph } = Typography;
 const { Meta } = Card;
@@ -104,14 +105,7 @@ const DailyRecommendation: React.FC = () => {
       .join('\n');
     
     // 简单实现：复制到剪贴板
-    navigator.clipboard.writeText(shoppingListText)
-      .then(() => {
-        alert('购物清单已复制到剪贴板！');
-      })
-      .catch(err => {
-        console.error('复制失败:', err);
-        alert('复制失败，请手动记录购物清单。');
-      });
+    copyText(shoppingListText)
   };
 
   // 按菜谱类型分组推荐
