@@ -213,7 +213,7 @@ const DailyRecommendation: React.FC = () => {
                     <Link to={`/recipe/${recipe.recipeId}`}>
                       <Card
                         hoverable
-                        cover={<img alt={recipe.recipeName} src={recipe.imageUrl} />}
+                        cover={recipe.imageUrl && <img alt={recipe.recipeName} src={recipe.imageUrl} />}
                       >
                         <Meta 
                           title={recipe.recipeName} 
