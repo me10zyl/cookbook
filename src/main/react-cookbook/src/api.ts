@@ -3,7 +3,7 @@ import {showError} from "./util/messageService.ts";
 
 // 创建axios实例
 const api = axios.create({
-  baseURL: 'http://localhost:3001/api',
+  baseURL: process.env.REACT_APP_API_URL,
   timeout: 10000
 });
 
