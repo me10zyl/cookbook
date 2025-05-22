@@ -32,7 +32,6 @@ const DailyRecommendation: React.FC = () => {
 
   const preferenceOptions = [
     { label: '均衡饮食', value: 'balanced' },
-    { label: '低脂', value: 'low_fat' },
     { label: '素食', value: 'vegetarian' },
     { label: '快速烹饪', value: 'quick' },
   ];
