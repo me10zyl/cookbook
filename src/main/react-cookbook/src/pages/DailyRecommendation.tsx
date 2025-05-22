@@ -23,7 +23,7 @@ const DailyRecommendation: React.FC = () => {
   const [recommendations, setRecommendations] = useState<DailyRecipe[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
-  const [preferences, setPreferences] = useState<string[]>(['balanced']);
+  const [preferences, setPreferences] = useState<string>('balanced');
   const [shoppingList, setShoppingList] = useState<ShoppingItem[]>([]);
   const [showShoppingList, setShowShoppingList] = useState<boolean>(false);
 
@@ -42,7 +42,7 @@ const DailyRecommendation: React.FC = () => {
         'vegetarian': '素食',
         'quick': '快速烹饪'
       };
-      const preference = preferences.length > 0 ? preferenceMap[preferences[0]] : '均衡';
+      const preference = preferences ? preferenceMap[preferences] : '均衡';
       const response = await getDailyRecommendations(preference);
       const dayRecommendation: DayRecommendation = response.data;
       setRecommendations(dayRecommendation.recipes);
@@ -81,8 +81,8 @@ const DailyRecommendation: React.FC = () => {
   };
 
   // 处理偏好变化
-  const handlePreferenceChange = (checkedValues: string[]): void => {
-    setPreferences(checkedValues.length > 0 ? checkedValues : ['balanced']);
+  const handlePreferenceChange = (checkedValues: string): void => {
+    setPreferences(checkedValues.target.value);
   };
 
   // 处理刷新推荐
@@ -134,13 +134,13 @@ const DailyRecommendation: React.FC = () => {
       <div className="preference-section" style={{ marginBottom: 30 }}>
         <Row gutter={[16, 16]} align="middle">
           <Col xs={24} md={12}>
-            <DatePicker 
+          {/*  <DatePicker
               value={dayjs(date)} 
               onChange={handleDateChange} 
               format="YYYY-MM-DD" 
               locale={locale}
               style={{ marginRight: 16 }}
-            />
+            />*/}
             <Button 
               icon={<ReloadOutlined />} 
               onClick={handleRefresh} 
