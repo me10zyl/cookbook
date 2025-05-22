@@ -14,5 +14,4 @@ public class RecipeIngredients {
     private Integer recipeId;
     private Integer ingredientsId;
     private String quantity;
-    private boolean isRequired  ;
 }
