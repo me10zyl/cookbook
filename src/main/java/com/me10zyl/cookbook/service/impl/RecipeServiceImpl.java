@@ -27,7 +27,7 @@ import static com.me10zyl.cookbook.util.StreamUtil.mapId;
 @Service
 @RequiredArgsConstructor
 public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> implements RecipeService {
-    
+
     private final IntegredientsService integredientsService;
     private final RecipeIngredientsService recipeIngredientsService;
 
@@ -65,12 +65,12 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
                         // 解析用量数值和单位
                         double existingAmount = parseQuantity(existingQuantity);
                         //无法解析的情况
-                        if(existingAmount == 0){
+                        if (existingAmount == 0) {
                             existingIngredient.setQuantity(newQuantity);
                             continue;
                         }
                         double newAmount = parseQuantity(newQuantity);
-                        if(newAmount == 0){
+                        if (newAmount == 0) {
                             existingIngredient.setQuantity(newQuantity);
                             continue;
                         }
@@ -79,9 +79,9 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
                         double totalAmount = existingAmount + newAmount;
                         // 拼接新的用量字符串
                         //.0去掉
-                        if(totalAmount == (int)totalAmount){
-                            existingIngredient.setQuantity((int)totalAmount + unit);
-                        }else {
+                        if (totalAmount == (int) totalAmount) {
+                            existingIngredient.setQuantity((int) totalAmount + unit);
+                        } else {
                             existingIngredient.setQuantity(totalAmount + unit);
                         }
                     }
@@ -130,10 +130,10 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
     }
 
     private DataFlow checkParams(Recipes recipe) {
-        ParamUtil.checkBlank(recipe, false, "recipeName", "ingredients", "description", "steps", "imageUrl",  "isMeat", "isSoup", "cookTime", "difficulty");
+        ParamUtil.checkBlank(recipe, false, "recipeName", "ingredients", "description", "steps", "imageUrl", "isMeat", "isSoup", "cookTime", "difficulty");
         DataFlow dataFlow = new DataFlow();
         List<CookIngredients> ingredients = recipe.getIngredients();
-        if(CollUtil.isEmpty(ingredients)){
+        if (CollUtil.isEmpty(ingredients)) {
             throw new ServiceException("食材不能为空");
         }
         dataFlow.put("ingredients", ingredients);
@@ -166,7 +166,7 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
 
     @Override
     public CookIngredients createIngredient(CookIngredients ingredient) {
-        if(integredientsService.hasName(ingredient.getIngredientsName())){
+        if (integredientsService.hasName(ingredient.getIngredientsName())) {
             throw new ServiceException("已有该食材：" + ingredient.getIngredientsName());
         }
         integredientsService.save(ingredient);
@@ -203,9 +203,9 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
         List<Recipes> recipesByIngredients = baseMapper.findRecipesByIngredients(ingredientIds);
         recipesByIngredients.forEach(recipe -> {
             List<CookIngredients> ingredients = integredientsService.findByRecipeId(recipe.getRecipeId());
-            recipe.setMatchedIngredients(StreamUtil.filter(ingredients,e-> ingredientIds.contains(e.getIngredientsId()))
+            recipe.setMatchedIngredients(StreamUtil.filter(ingredients, e -> ingredientIds.contains(e.getIngredientsId()))
                     .stream().map(CookIngredients::getIngredientsName).collect(Collectors.toList()));
-            recipe.setMissingIngredients(StreamUtil.filter(ingredients,e-> !ingredientIds.contains(e.getIngredientsId()))
+            recipe.setMissingIngredients(StreamUtil.filter(ingredients, e -> !ingredientIds.contains(e.getIngredientsId()))
                     .stream().map(CookIngredients::getIngredientsName).collect(Collectors.toList()));
         });
         return recipesByIngredients;
@@ -215,7 +215,7 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
     public DayRecommendation getDailyRecommendations(String preference) {
         List<Recipes> filteredRecipes = null;
 
-        if(StrUtil.isBlank(preference)){
+        if (StrUtil.isBlank(preference)) {
             preference = "均衡";
         }
         switch (preference.toLowerCase()) {
@@ -234,7 +234,20 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
         DayRecommendation dayRecommendation = new DayRecommendation();
         dayRecommendation.setAllIngredients(getIngredientsForRecipes(mapId(filteredRecipes, Recipes::getRecipeId)));
         dayRecommendation.setRecipes(filteredRecipes);
+        for (Recipes filteredRecipe : filteredRecipes) {
+            setType(filteredRecipe);
+        }
         return dayRecommendation;
+    }
+
+    private void setType(Recipes recipe) {
+        if (recipe.getIsSoup()) {
+            recipe.setType("汤品");
+        } else if (recipe.getIsMeat()) {
+            recipe.setType("荤菜");
+        } else {
+            recipe.setType("素菜");
+        }
     }
 
     private List<Recipes> getQuickRecipes() {

@@ -70,4 +70,6 @@ public class Recipes {
     List<String> matchedIngredients;
     @TableField(exist = false)
     List<String>   missingIngredients;
+    @TableField(exist = false)
+    private String type;
 }

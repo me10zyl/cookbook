@@ -13,7 +13,7 @@
         group by a.recipe_id
     </select>
     <select id="getBalanceRecipes" resultType="com.me10zyl.cookbook.entity.Recipes">
-            (SELECT * FROM recipes WHERE is_meat = 1 ORDER BY RAND() LIMIT 1)
+            (SELECT * FROM recipes WHERE is_meat = 1  and is_soup = 0 ORDER BY RAND() LIMIT 1)
             UNION ALL
             (SELECT * FROM recipes WHERE is_meat = 0 and is_soup = 0 ORDER BY RAND() LIMIT 1)
             UNION ALL

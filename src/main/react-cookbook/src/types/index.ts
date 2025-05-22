@@ -47,3 +47,12 @@ export interface GroupedIngredients {
   flavour: Ingredient[];
   other: Ingredient[];
 }
+
+export interface DailyRecipe extends Recipe {
+
+}
+
+export interface DayRecommendation {
+  recipes: DailyRecipe[];
+  allIngredients: Ingredient[];
+}
