@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import com.me10zyl.cookbook.dto.AIData;
 import com.me10zyl.cookbook.dto.DayRecommendation;
 import com.me10zyl.cookbook.entity.CookIngredients;
 import com.me10zyl.cookbook.entity.Recipes;
@@ -15,6 +16,7 @@ import com.me10zyl.cookbook.service.RecipeService;
 import com.me10zyl.cookbook.util.DataFlow;
 import com.me10zyl.cookbook.util.ParamUtil;
 import com.me10zyl.cookbook.util.StreamUtil;
+import com.me10zyl.cookbook.util.TextToRecipeConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -130,7 +132,7 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
     }
 
     private DataFlow checkParams(Recipes recipe) {
-        ParamUtil.checkBlank(recipe, false, "recipeName", "ingredients", "description", "steps", "imageUrl", "isMeat", "isSoup", "cookTime", "difficulty");
+        ParamUtil.checkBlank(recipe, false, "recipeName", "ingredients", "description", "steps", "isMeat", "isSoup", "cookTime", "difficulty");
         DataFlow dataFlow = new DataFlow();
         List<CookIngredients> ingredients = recipe.getIngredients();
         if (CollUtil.isEmpty(ingredients)) {
@@ -212,8 +214,8 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
     }
 
     @Override
-    public Recipes parseRecipe(String recipe) {
-        return null;
+    public Recipes parseRecipe(AIData recipe) {
+        return TextToRecipeConverter.convertTextToRecipe(recipe.getData());
     }
 
     @Override

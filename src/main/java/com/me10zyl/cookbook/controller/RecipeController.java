@@ -1,6 +1,7 @@
 package com.me10zyl.cookbook.controller;
 
 
+import com.me10zyl.cookbook.dto.AIData;
 import com.me10zyl.cookbook.dto.DayRecommendation;
 import com.me10zyl.cookbook.entity.CookIngredients;
 import com.me10zyl.cookbook.entity.Recipes;
@@ -63,7 +64,7 @@ public class RecipeController {
 
     //解析AI生成的菜谱
     @PostMapping("/fillWithAIData")
-    public Recipes parseRecipe(@RequestBody String recipe) {
+    public Recipes parseRecipe(@RequestBody AIData recipe) {
         return recipeService.parseRecipe(recipe);
     }
 }

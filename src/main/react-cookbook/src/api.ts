@@ -21,10 +21,8 @@ api.interceptors.response.use(
             console.error('发生服务器错误', response.data.message)
             showError(response.data.message);
           }
-          throw new Error(response.data.message);
         }
       }
-      throw new Error(response.data.message);
     },
     // 响应失败时，返回错误信息
     (error) => {
@@ -116,5 +114,5 @@ export const getDailyRecommendations = async (preference?: string) => {
 
 // AI填数据
 export const fillWithAIData = async (data: string) => {
-  return api.post('/recipes/fillWithAIData', data);
+  return api.post('/recipes/fillWithAIData', {data : data});
 };

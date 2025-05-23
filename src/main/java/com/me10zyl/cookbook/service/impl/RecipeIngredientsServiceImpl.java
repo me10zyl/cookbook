@@ -44,15 +44,19 @@ public class RecipeIngredientsServiceImpl  extends ServiceImpl<RecipeIngredients
             if(StrUtil.isBlank(ingredientsName)){
                 throw new ServiceException("食材名称不能为空");
             }
-            if(integredientsService.
-                    lambdaQuery().eq(CookIngredients::getIngredientsName, ingredientsName).count() > 0){
-                throw new ServiceException("食材名称重复");
+            CookIngredients exists = integredientsService.
+                    lambdaQuery().eq(CookIngredients::getIngredientsName, ingredientsName).last("limit 1").one();
+            if(exists != null){
+                cookIngredients.setIngredientsId(exists.getIngredientsId());
+                continue;
             }
             cookIngredients.setIsMain(false);
             cookIngredients.setIsFlavour(false);
             cookIngredients.setIsMeat(false);
             integredientsService.save(cookIngredients);
         }
+        filter = filter(ingredients, e -> e.getIngredientsId() == null);
+        List<CookIngredients> filter2 = filter(ingredients, e -> e.getIngredientsId() != null);
 
         if(CollUtil.isNotEmpty(filter)) {
             saveBatch(mapId(filter, e -> {
@@ -65,7 +69,7 @@ public class RecipeIngredientsServiceImpl  extends ServiceImpl<RecipeIngredients
         }
 
         List<RecipeIngredients> recipeIngredients = listByRecipeId(recipeId);
-        DiffUtil.diff(mapId(ingredients, e->{
+        DiffUtil.diff(mapId(filter2, e->{
             return new RecipeIngredients()
                     .setIngredientsId(e.getIngredientsId())
                     .setRecipeId(recipeId)
@@ -79,14 +83,17 @@ public class RecipeIngredientsServiceImpl  extends ServiceImpl<RecipeIngredients
     private static void checkDuplicate(List<CookIngredients> ingredients) {
         Set<Integer> ids = new HashSet<>();
         Set<String> names = new HashSet<>();
-        for (CookIngredients ingredient : ingredients) {
+        for (CookIngredients ingredient : filter(ingredients,e->e.getIngredientsId() != null)) {
             if(ids.contains(ingredient.getIngredientsId())){
                 throw new ServiceException("食材ID重复");
             }
-            if(names.contains(ingredient.getIngredientsName())){
-                throw new ServiceException("食材名称重复");
-            }
             ids.add(ingredient.getIngredientsId());
+        }
+        for (CookIngredients ingredient : filter(ingredients,e->e.getIngredientsId() == null
+        && StrUtil.isNotBlank(e.getIngredientsName()))) {
+            if(names.contains(ingredient.getIngredientsName())){
+                throw new ServiceException("食材名称重复:" + ingredient.getIngredientsName());
+            }
             names.add(ingredient.getIngredientsName());
         }
     }

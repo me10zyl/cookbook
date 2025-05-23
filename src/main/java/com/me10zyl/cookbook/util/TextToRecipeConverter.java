@@ -50,7 +50,7 @@ public class TextToRecipeConverter {
         recipe.setIsSoup(isSoup);
 
         // 提取烹饪时间
-        String cookTime = extractField(text, "(?:\\*\\*)?烹饪时间（分钟）(?:\\*\\*)?：(.*?)\n");
+        String cookTime = extractField(text, "(?:\\*\\*)?烹饪时间[\\(（]分钟[）\\)](?:\\*\\*)?：(\\d+)");
         recipe.setCookTime(Integer.parseInt(cookTime));
 
         // 提取难度

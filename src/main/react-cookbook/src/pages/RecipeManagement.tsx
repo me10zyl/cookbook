@@ -211,20 +211,31 @@ const RecipeManagement: React.FC = () => {
 
   const fillWithAIInput = async ()=>{
     if(aiInputText){
-      const record: Recipe = await fillWithAIData(aiInputText).data;
-      recipeForm.setFieldsValue({
-        recipeName: record.recipeName,
-        description: record.description,
-        imageUrl: record.imageUrl,
-        bilibiliUrl: record.bilibiliUrl,
-        isMeat: record.isMeat,
-        isSoup: record.isSoup,
-        cookTime: record.cookTime,
-        difficulty: record.difficulty,
-        formattedSteps: JSON.parse(record.steps),
-        ingredients: record.ingredients
-      });
-      setShowAIInput(false);
+      try {
+        const record: Recipe = (await fillWithAIData(aiInputText)).data;
+        if(record){
+          console.log('record', record)
+          for(let i = 0;i < record.ingredients.length;i++){
+            setUseInput(prev => ({ ...prev, [i]: true }))
+          }
+
+          recipeForm.setFieldsValue({
+            recipeName: record.recipeName,
+            description: record.description,
+            imageUrl: record.imageUrl,
+            bilibiliUrl: record.bilibiliUrl,
+            isMeat: record.isMeat,
+            isSoup: record.isSoup,
+            cookTime: record.cookTime,
+            difficulty: record.difficulty,
+            formattedSteps: JSON.parse(record.steps),
+            ingredients: record.ingredients
+          });
+          setShowAIInput(false);
+        }
+      } catch (error) {
+        console.log('errrrr', error)
+      }
     }else{
       showError('请输入AI输入的文本');
     }
