@@ -34,6 +34,7 @@ const RecipeManagement: React.FC = () => {
   const [ingredientLoading, setIngredientLoading] = useState(false);
   const [showAIInput, setShowAIInput] = useState(false);
   const [aiInputText, setAiInputText] = useState('');
+  const [useInput, setUseInput] = useState<Record<number, boolean>>({});
 
   // 模拟从API获取数据
   useEffect(() => {
@@ -196,11 +197,10 @@ const RecipeManagement: React.FC = () => {
     }
   };
 
-  const handleSelectIngredient = (value: number, field: any) => {
+  const handleSelectIngredient = async (value: number, field: any) => {
     const selectedIngredient = ingredients.find(ingredient => ingredient.ingredientsId === value);
     if (selectedIngredient) {
       let vname = ['ingredients', field.name];
-      console.log(vname,recipeForm.getFieldValue(vname), selectedIngredient.defaultQuantity)
       recipeForm.setFieldValue(
         vname, {
           ...recipeForm.getFieldValue(vname),
@@ -463,19 +463,29 @@ const RecipeManagement: React.FC = () => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {fields.map((field, index) => (
                         <Space key={field.key} align="baseline">
-                          <Form.Item
-                            {...field}
-                            name={[field.name, 'ingredientsId']}
-                            rules={[{ required: true, message: '请选择食材' }]}
-                          >
-                            <Select style={{ width: 200 }} placeholder="选择食材"  onChange={(value) => handleSelectIngredient(value, field)}>
-                              {ingredients.map(ingredient => (
-                                <Option key={ingredient.ingredientsId} value={ingredient.ingredientsId}>
-                                  {ingredient.ingredientsName}
-                                </Option>
-                              ))}
-                            </Select>
-                          </Form.Item>
+                          {useInput[index] ? (
+                            <Form.Item
+                              {...field}
+                              name={[field.name, 'ingredientsName']}
+                              rules={[{ required: true, message: '请输入食材名称' }]}
+                            >
+                              <Input placeholder="输入食材名称" style={{ width: 200 }} />
+                            </Form.Item>
+                          ) : (
+                            <Form.Item
+                              {...field}
+                              name={[field.name, 'ingredientsId']}
+                              rules={[{ required: true, message: '请选择食材' }]}
+                            >
+                              <Select style={{ width: 200 }} placeholder="选择食材"  onChange={(value) => handleSelectIngredient(value, field)}>
+                                {ingredients.map(ingredient => (
+                                  <Option key={ingredient.ingredientsId} value={ingredient.ingredientsId}>
+                                    {ingredient.ingredientsName}
+                                  </Option>
+                                ))}
+                              </Select>
+                            </Form.Item>
+                          )}
                           <Form.Item
                             {...field}
                             name={[field.name, 'quantity']}
@@ -484,6 +494,13 @@ const RecipeManagement: React.FC = () => {
                             <Input placeholder="输入用量" style={{ width: 120 }} />
                           </Form.Item>
                           <MinusCircleOutlined onClick={() => remove(field.name)} />
+                          {/* 切换输入框/选择框按钮 */}
+                          <Button
+                              type="link"
+                              onClick={() => setUseInput(prev => ({ ...prev, [index]: !prev[index] }))}
+                          >
+                            {useInput[index] ? '使用选择框' : '使用输入框'}
+                          </Button>
                         </Space>
                       ))}
                       <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
