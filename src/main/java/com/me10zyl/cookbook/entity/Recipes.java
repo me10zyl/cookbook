@@ -54,7 +54,7 @@ public class Recipes {
     List<CookIngredients> ingredients;
 
     @AllArgsConstructor
-    public enum Difficulty implements IEnum<String> {
+    public static enum Difficulty implements IEnum<String> {
         EASY("简单"),
         MIDDLE("中等"),
         HARD("困难");
