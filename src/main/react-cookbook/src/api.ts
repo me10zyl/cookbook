@@ -113,3 +113,8 @@ export const getDailyRecommendations = async (preference?: string) => {
   const params = preference ? { preference } : {};
   return api.get('/recipes/daily-recommendations', { params });
 };
+
+// AI填数据
+export const fillWithAIData = async (data: string) => {
+  return api.post('/recipes/fillWithAIData', data);
+};

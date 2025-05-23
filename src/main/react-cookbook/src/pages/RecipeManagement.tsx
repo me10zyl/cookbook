@@ -10,7 +10,7 @@ import {
   getAllIngredients,
   createIngredient,
   updateIngredient,
-  getAllRecipes, getRecipeDetails
+  getAllRecipes, getRecipeDetails, fillWithAIData
 } from '../api.ts';
 import {showSuccess, showError} from "../util/messageService.ts";
 
@@ -32,6 +32,8 @@ const RecipeManagement: React.FC = () => {
   const [ingredientForm] = Form.useForm();
   const [editingIngredientId, setEditingIngredientId] = useState<number | null>(null);
   const [ingredientLoading, setIngredientLoading] = useState(false);
+  const [showAIInput, setShowAIInput] = useState(false);
+  const [aiInputText, setAiInputText] = useState('');
 
   // 模拟从API获取数据
   useEffect(() => {
@@ -207,6 +209,27 @@ const RecipeManagement: React.FC = () => {
     }
   };
 
+  const fillWithAIInput = async ()=>{
+    if(aiInputText){
+      const record: Recipe = await fillWithAIData(aiInputText).data;
+      recipeForm.setFieldsValue({
+        recipeName: record.recipeName,
+        description: record.description,
+        imageUrl: record.imageUrl,
+        bilibiliUrl: record.bilibiliUrl,
+        isMeat: record.isMeat,
+        isSoup: record.isSoup,
+        cookTime: record.cookTime,
+        difficulty: record.difficulty,
+        formattedSteps: JSON.parse(record.steps),
+        ingredients: record.ingredients
+      });
+      setShowAIInput(false);
+    }else{
+      showError('请输入AI输入的文本');
+    }
+  }
+
   // 食谱表格列定义
   const recipeColumns = [
     {
@@ -374,6 +397,16 @@ const RecipeManagement: React.FC = () => {
           />
 
           <Modal
+            title={'使用AI数据填充'}
+            visible={showAIInput}
+            onOk={fillWithAIInput}
+            onCancel={()=>{setShowAIInput(false)}}
+          >
+            <Input.TextArea value={aiInputText}
+                            onChange={(e)=>{setAiInputText(e.target.value)}}
+                            rows={10} placeholder="请输入菜谱描述"  />
+          </Modal>
+          <Modal
             title={editingRecipeId === null ? '添加菜谱' : '编辑菜谱'}
             visible={recipeModalVisible}
             onCancel={() => setRecipeModalVisible(false)}
@@ -384,6 +417,11 @@ const RecipeManagement: React.FC = () => {
               form={recipeForm}
               layout="vertical"
             >
+              <Button
+                  type="link"
+                  onClick={()=>{setShowAIInput(true)}}
+                  style={{ marginBottom: 16 }}
+              >使用AI数据填充</Button>
               <Form.Item
                 name="recipeName"
                 label="菜谱名称"
@@ -403,7 +441,7 @@ const RecipeManagement: React.FC = () => {
               <Form.Item
                 name="imageUrl"
                 label="图片URL"
-                rules={[{ required: true, message: '请输入图片URL' }]}
+                rules={[{ required: false, message: '请输入图片URL' }]}
               >
                 <Input placeholder="请输入图片URL" />
               </Form.Item>
