@@ -1,31 +1,69 @@
 package com.me10zyl.cookbook.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.me10zyl.cookbook.entity.CookIngredients;
 import com.me10zyl.cookbook.entity.RecipeIngredients;
 import com.me10zyl.cookbook.exception.ServiceException;
 import com.me10zyl.cookbook.repository.RecipeIngredientsMapper;
+import com.me10zyl.cookbook.service.IntegredientsService;
 import com.me10zyl.cookbook.service.RecipeIngredientsService;
 import com.me10zyl.cookbook.util.DiffUtil;
 import com.me10zyl.cookbook.util.ParamUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import static com.me10zyl.cookbook.util.StreamUtil.filter;
 import static com.me10zyl.cookbook.util.StreamUtil.mapId;
 
 @Service
 public class RecipeIngredientsServiceImpl  extends ServiceImpl<RecipeIngredientsMapper, RecipeIngredients> implements RecipeIngredientsService {
+
+    @Autowired
+    private IntegredientsService integredientsService;
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveUpdate(List<CookIngredients> ingredients, Integer recipeId) {
         for (CookIngredients ingredient : ingredients) {
             ParamUtil.checkBlank(ingredient, false, "quantity");
         }
-        if(new HashSet<>(mapId(ingredients, CookIngredients::getIngredientsId)).size()
-                != ingredients.size()) {
-            throw new ServiceException("食材不能重复");
+        //检查重复
+        checkDuplicate(ingredients);
+
+        List<CookIngredients> filter = filter(ingredients, e -> e.getIngredientsId() == null);
+        for (CookIngredients cookIngredients : filter) {
+            String ingredientsName = cookIngredients.getIngredientsName();
+            if(StrUtil.isBlank(ingredientsName)){
+                throw new ServiceException("食材名称不能为空");
+            }
+            if(integredientsService.
+                    lambdaQuery().eq(CookIngredients::getIngredientsName, ingredientsName).count() > 0){
+                throw new ServiceException("食材名称重复");
+            }
+            cookIngredients.setIsMain(false);
+            cookIngredients.setIsFlavour(false);
+            cookIngredients.setIsMeat(false);
+            integredientsService.save(cookIngredients);
         }
+
+        if(CollUtil.isNotEmpty(filter)) {
+            saveBatch(mapId(filter, e -> {
+                RecipeIngredients recipeIngredients = new RecipeIngredients();
+                recipeIngredients.setRecipeId(recipeId);
+                recipeIngredients.setIngredientsId(e.getIngredientsId());
+                recipeIngredients.setQuantity(e.getQuantity());
+                return recipeIngredients;
+            }));
+        }
+
         List<RecipeIngredients> recipeIngredients = listByRecipeId(recipeId);
         DiffUtil.diff(mapId(ingredients, e->{
             return new RecipeIngredients()
@@ -36,6 +74,21 @@ public class RecipeIngredientsServiceImpl  extends ServiceImpl<RecipeIngredients
                     ;
         }), recipeIngredients, RecipeIngredients::getIngredientsId)
                 .applyPatch(this);
+    }
+
+    private static void checkDuplicate(List<CookIngredients> ingredients) {
+        Set<Integer> ids = new HashSet<>();
+        Set<String> names = new HashSet<>();
+        for (CookIngredients ingredient : ingredients) {
+            if(ids.contains(ingredient.getIngredientsId())){
+                throw new ServiceException("食材ID重复");
+            }
+            if(names.contains(ingredient.getIngredientsName())){
+                throw new ServiceException("食材名称重复");
+            }
+            ids.add(ingredient.getIngredientsId());
+            names.add(ingredient.getIngredientsName());
+        }
     }
 
     @Override

@@ -212,6 +212,11 @@ public class RecipeServiceImpl extends ServiceImpl<RecipesMapper, Recipes> imple
     }
 
     @Override
+    public Recipes parseRecipe(String recipe) {
+        return null;
+    }
+
+    @Override
     public DayRecommendation getDailyRecommendations(String preference) {
         List<Recipes> filteredRecipes = null;
 

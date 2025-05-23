@@ -34,4 +34,6 @@ public interface RecipeService extends IService<Recipes> {
     List<Recipes> getHotRecipes();
 
     List<Recipes> matchRecipes(List<Integer> ingredientsIds);
+
+    Recipes parseRecipe(String recipe);
 }

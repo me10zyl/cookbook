@@ -60,4 +60,10 @@ public class RecipeController {
     public List<Recipes> getHotRecipes() {
         return recipeService.getHotRecipes();
     }
+
+    //解析AI生成的菜谱
+    @PostMapping("/fillWithAIData")
+    public Recipes parseRecipe(@RequestBody String recipe) {
+        return recipeService.parseRecipe(recipe);
+    }
 }
