@@ -12,12 +12,11 @@ create table cook_ingredients
     icon             varchar(30)                        null comment '图片',
     description      varchar(255)                       null comment '食材描述',
     create_time      datetime default CURRENT_TIMESTAMP not null comment '创建时间',
-    default_quantity varchar(30)                        not null comment '默认用量',
+    default_quantity varchar(30)                        null comment '默认用量',
     constraint cook_ingredients_pk_2
         unique (ingredients_name)
 )
     comment '食材';
-
 
 -- auto-generated definition
 create table recipe_ingredients
@@ -31,7 +30,6 @@ create table recipe_ingredients
         unique (recipe_id, ingredients_id)
 )
     comment '菜谱与食材的关联表';
-
 
 -- auto-generated definition
 create table recipes
@@ -54,5 +52,4 @@ create table recipes
 
 create index idx_cook_time
     on recipes (cook_time);
-
 

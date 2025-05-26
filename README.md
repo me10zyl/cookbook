@@ -1,0 +1,81 @@
+# 菜谱与食材管理系统
+
+## 项目概述
+本项目是一个基于Spring Boot和React的菜谱与食材管理系统。后端使用Spring Boot框架提供RESTful API服务，前端使用React和Ant Design构建用户界面。用户能够对菜谱和食材信息进行添加、编辑、删除等操作，还能利用AI数据填充功能快速创建菜谱。
+
+## 技术栈
+### 后端
+- **Spring Boot 3.4.5**：企业级Java开发框架
+- **MyBatis-Plus**：增强的MyBatis ORM框架
+- **MySQL**：数据库
+- **Lombok**：Java代码简化工具
+- **Hutool**：Java工具包
+- **FastJSON**：JSON处理库
+
+### 前端
+- **React**：用于构建用户界面的JavaScript库
+- **TypeScript**：为JavaScript提供静态类型检查
+- **Ant Design**：企业级UI设计语言和React组件库
+
+## 功能特性
+### 菜谱管理
+- 查看菜谱列表
+- 添加新菜谱
+- 编辑现有菜谱
+- 删除菜谱
+- 使用AI数据填充功能快速创建菜谱
+
+### 食材管理
+- 查看食材列表
+- 添加新食材
+- 编辑现有食材
+- 删除食材
+
+## 项目结构
+```
+src/
+  ├── main/
+  │   ├── java/         # 后端Java代码
+  │   ├── react-cookbook/  # 前端React代码
+  │   └── resources/    # 配置文件和静态资源
+  └── test/
+      └── java/        # 测试代码
+```
+
+## 开发环境要求
+- JDK 17或以上
+- Node.js和npm
+- MySQL数据库
+
+## 运行步骤
+
+### 后端服务
+1. 确保MySQL服务已启动
+2. 使用Maven安装依赖：
+```bash
+./mvnw install
+```
+3. 运行Spring Boot应用：
+```bash
+./mvnw spring-boot:run
+```
+
+### 前端开发
+1. 进入前端项目目录：
+```bash
+cd src/main/react-cookbook
+```
+2. 安装依赖：
+```bash
+npm install
+```
+3. 启动开发服务器：
+```bash
+npm start
+```
+4. 访问 `. 访问 `http://localhost:3000` 查看前端应用。
+
+## 数据库
+项目使用MySQL数据库，初始化SQL脚本位于：
+- `ddl.sql`：数据库表结构
+- `sample.sql`：示例数据
